@@ -1,4 +1,10 @@
-from backend.app import db
+from flask_sqlalchemy import SQLAlchemy
+
+db = SQLAlchemy()
+
+
+def init(app):
+    db.init_app(app)
 
 
 class DbError(Exception):
