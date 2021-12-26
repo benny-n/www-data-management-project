@@ -13,8 +13,7 @@ db.init(app)
 def register_user():
     try:
         chat_id = int(request.args.get("chat_id"))
-        username = request.args.get("username")
-        db.add_user(chat_id, username)
+        db.add_user(chat_id)
         return Response("Welcome to the student polls management service!")
     except IntegrityError:
         return Response("You are already registered!", status=409)
@@ -24,8 +23,7 @@ def register_user():
 def remove_user():
     try:
         chat_id = int(request.args.get("chat_id"))
-        username = request.args.get("username")
-        db.delete_user(chat_id, username)
+        db.delete_user(chat_id)
         return Response("Goodbye! 👋")
     except DbErrorDelete as err:
         return Response(err.message, status=404)

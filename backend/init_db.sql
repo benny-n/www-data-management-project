@@ -14,13 +14,12 @@ CREATE TABLE poll_answer(
     PRIMARY KEY(poll_uid, answer)
 );
 CREATE TABLE "user"(
-    chat_id BIGINT PRIMARY KEY,
-    username VARCHAR(255)
+    chat_id BIGINT PRIMARY KEY
 );
 CREATE TABLE user_response(
     chat_id BIGINT,
     poll_uid BIGINT,
     answer VARCHAR(255),
     FOREIGN KEY(poll_uid, answer) REFERENCES poll_answer(poll_uid, answer) ON DELETE CASCADE,
-    FOREIGN KEY(chat_id) REFERENCES "user"(chat_id) ON DELETE CASCADE
+    FOREIGN KEY(chat_id) REFERENCES "user"(chat_id)
 );
