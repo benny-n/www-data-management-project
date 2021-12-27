@@ -26,15 +26,25 @@ class User(db.Model):
 
 
 def add_user(chat_id: int):
-    db.session.add(User(chat_id=chat_id))
-    db.session.commit()
+    try:
+        db.session.add(User(chat_id=chat_id))
+        db.session.commit()
+
+    except Exception:
+        db.session.rollback()
+        raise
 
 
 def delete_user(chat_id: int):
-    user_to_delete: User = User.query.filter_by(chat_id=chat_id).first()
-    if not user_to_delete:
-        raise DbErrorDeleteBeforeRegister()
+    try:
+        user_to_delete: User = User.query.filter_by(chat_id=chat_id).first()
+        if not user_to_delete:
+            raise DbErrorDeleteBeforeRegister()
 
-    db.session.delete(user_to_delete)
-    db.session.commit()
+        db.session.delete(user_to_delete)
+        db.session.commit()
+
+    except Exception:
+        db.session.rollback()
+        raise
 
