@@ -1,14 +1,9 @@
-import { AppBar, Box, Container, Theme, Toolbar, Typography } from '@mui/material';
+import { AppBar, Box, Toolbar, Typography } from '@mui/material';
 import ThemeButton from './ThemeButton';
 
-interface NavBarProps{
-    theme: Theme,
-    colorMode: {toggleColorMode: () => void;},
-}
-
-function NavBar(props: NavBarProps){
+const NavBar: React.FC = () => { 
     return(
-        <Box sx={{ flexGrow: 1 }}>
+        <Box sx={{ flexGrow: 1, display: 'flex' }}>
             <AppBar position="relative" > 
                 <Toolbar>
                     <Typography
@@ -21,7 +16,7 @@ function NavBar(props: NavBarProps){
                         Welcome to Telegram Polls!
                     </Typography>
                     <Box sx={{ flexGrow: 1, display: { xs: 'flex'} }}>
-                        <ThemeButton {...props}/>
+                        <ThemeButton />
                     </Box>
                 </Toolbar>
             </AppBar>

@@ -1,14 +1,13 @@
 import IconButton from '@mui/material/IconButton';
-import { Theme } from '@mui/material/styles';
+import { useTheme } from '@mui/material/styles';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
+import { ColorModeContext } from './App';
+import React from 'react';
 
-interface ThemeButtonProps{
-    theme: Theme,
-    colorMode: {toggleColorMode: () => void;},
-}
-
-function ThemeButton({theme, colorMode}: ThemeButtonProps){
+const ThemeButton: React.FC = () => {
+    const theme = useTheme();
+    const colorMode = React.useContext(ColorModeContext);
     return(
         <IconButton 
             size="large"
