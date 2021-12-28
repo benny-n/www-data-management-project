@@ -3,10 +3,6 @@ from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
 
-def init(app):
-    db.init_app(app)
-
-
 class DbError(Exception):
     def __init__(self):
         self.message = ''
@@ -23,6 +19,12 @@ class DbErrorDeleteBeforeRegister(DbErrorDelete):
 
 class User(db.Model):
     chat_id = db.Column(db.Integer, primary_key=True)
+
+
+def init(app):
+    with app.app_context():
+        db.init_app(app)
+        db.create_all()
 
 
 def add_user(chat_id: int):
