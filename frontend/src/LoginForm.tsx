@@ -1,8 +1,9 @@
 import { AccountCircle, Password } from "@mui/icons-material";
 import { Box, Button, InputAdornment, TextField } from "@mui/material"
 import React from "react";
+import RegisterForm from "./RegisterForm";
 
-const LoginBox: React.FC = () => {
+const LoginForm: React.FC = () => {
   const [username, setUsername] = React.useState('');
   const [password, setPassword] = React.useState('');
   const handleUsernameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -13,11 +14,15 @@ const LoginBox: React.FC = () => {
   };
   const handleSubmit = (event: any) => {
     event.preventDefault();
-    console.log( 'Username:', username, 'Password: ', password); 
+    //TODO remove this log
+    console.log("LOGIN FORM SAYS:", 'Username:', username, 'Password: ', password); 
   };
-    return(
+    
+  return(
+    <div>
       <form 
         onSubmit={handleSubmit}
+        id="login-form"
         style={{ 
           width: '30%', 
           minWidth: '500px', 
@@ -30,6 +35,8 @@ const LoginBox: React.FC = () => {
             flexDirection: 'column',
             p: 5,
             m: 5,
+            marginBottom: 1,
+            paddingBottom: 1,
             gap: 2,
             bgcolor: 'secondary',
           }}
@@ -63,13 +70,27 @@ const LoginBox: React.FC = () => {
               ),
             }} 
           />
-          <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'space-between', gap: 5 }}>
-            <Button type="submit" sx={{width: '100%'}} size="large" variant="contained">LOGIN</Button>
-            <Button sx={{width: '100%'}} size="large" variant="contained">SIGN UP</Button>
-          </div>
         </Box>
       </form>
-    )
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          p: 5,
+          m: 5,
+          marginTop: 0,
+          paddingTop: 0,
+          gap: 2,
+          bgcolor: 'secondary',
+        }}
+      > 
+        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'space-between', gap: 5 }}>
+          <Button type="submit" form="login-form" sx={{width: '80%'}} size="large" variant="contained">LOGIN</Button>
+          <RegisterForm />
+        </div>
+      </Box>
+    </div>
+  )
 }
 
-export default LoginBox;
+export default LoginForm;

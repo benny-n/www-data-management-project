@@ -11,7 +11,6 @@ const ThemeButton: React.FC = () => {
     return(
         <IconButton 
             size="large"
-            sx={{ ml: 1, left: "90%"}} 
             onClick={colorMode.toggleColorMode}
             color="default"
         >

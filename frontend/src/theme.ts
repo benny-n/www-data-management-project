@@ -22,16 +22,21 @@ export const getAppTheme = (mode: PaletteMode) => {
         }
       : {
           // palette values for dark mode
-          primary: green,
-          secondary: grey,
-          divider: green[700],
-          background: {
-            default: grey[800],
-            paper: green[800],
+          primary: {
+              main: green[700],
+              light: green[500],
+              dark: green[900],
+              contrastText: "#000",
           },
+          secondary: grey,
+          divider: green[900],
           text: {
             primary: '#fff',
             secondary: grey[500],
+          },
+          background: {
+            default: grey[800],
+            paper: grey[800],
           },
         }),
     },

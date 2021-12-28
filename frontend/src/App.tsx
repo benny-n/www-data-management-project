@@ -3,8 +3,9 @@ import './App.css';
 import './theme'
 import {CssBaseline, styled, ThemeProvider} from '@mui/material'
 import NavBar from './NavBar';
-import LoginBox from './LoginBox';
+import LoginForm from './LoginForm';
 import { getAppTheme } from './theme';
+import RegisterForm from './RegisterForm';
 
 export const ColorModeContext = React.createContext({ toggleColorMode: () => {} });
 
@@ -14,7 +15,7 @@ function App() {
       <div>
         <NavBar />
         <LayoutWrapper>
-          <LoginBox />
+          <LoginForm />
         </LayoutWrapper>
       </div>
   );
