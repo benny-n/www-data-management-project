@@ -54,10 +54,11 @@ const RegisterForm: React.FC = () => {
           <Dialog open={open} onClose={handleClose} fullWidth >
             <DialogTitle>Registration</DialogTitle >
             <DialogContent >
-            <form 
+            <Box 
+              component="form"
+              sx={{display: 'flex', flexDirection: 'column', gap: 2, marginTop: 2}}
               id="register-form" 
               onSubmit={handleSubmit}
-              style={{display: 'flex', flexDirection: 'column', gap: 8, marginTop: 2}}
             >
               <TextField 
                 error={usernameError}
@@ -87,7 +88,7 @@ const RegisterForm: React.FC = () => {
                 autoComplete="new-password"
                 helperText={confirmPasswordError ? "Passwords don't match." : ""}
               />
-            </form>  
+            </Box>  
             </DialogContent>
             <DialogActions>
                 <Button type="submit" form="register-form" size="medium" variant="contained">Submit</Button>

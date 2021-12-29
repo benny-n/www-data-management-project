@@ -26,7 +26,6 @@ export const getAppTheme = (mode: PaletteMode) => {
               main: green[700],
               light: green[500],
               dark: green[900],
-              contrastText: "#000",
           },
           secondary: grey,
           divider: green[900],

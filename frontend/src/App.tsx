@@ -1,11 +1,10 @@
 import React from 'react';
 import './App.css';
 import './theme'
-import {CssBaseline, styled, ThemeProvider} from '@mui/material'
+import {Box, CssBaseline, ThemeProvider} from '@mui/material'
 import NavBar from './NavBar';
 import LoginForm from './LoginForm';
 import { getAppTheme } from './theme';
-import RegisterForm from './RegisterForm';
 
 export const ColorModeContext = React.createContext({ toggleColorMode: () => {} });
 
@@ -14,9 +13,9 @@ function App() {
   return (
       <div>
         <NavBar />
-        <LayoutWrapper>
+        <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
           <LoginForm />
-        </LayoutWrapper>
+        </Box>
       </div>
   );
 }
@@ -43,9 +42,3 @@ export default function ToggleColorMode() {
     </ColorModeContext.Provider>
   );
 }
-
-const LayoutWrapper = styled('div')`
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-`;

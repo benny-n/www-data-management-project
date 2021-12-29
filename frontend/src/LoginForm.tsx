@@ -20,58 +20,54 @@ const LoginForm: React.FC = () => {
     
   return(
     <div>
-      <form 
-        onSubmit={handleSubmit}
-        id="login-form"
-        style={{ 
+      <Box
+        component="form"
+        sx={{
           width: '30%', 
           minWidth: '500px', 
-          height: '50%', 
+          height: '50%',
+          display: 'flex',
+          flexDirection: 'column',
+          p: 5,
+          m: 5,
+          marginBottom: 1,
+          paddingBottom: 1,
+          gap: 2,
+          bgcolor: 'secondary',
         }}
-      >
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            p: 5,
-            m: 5,
-            marginBottom: 1,
-            paddingBottom: 1,
-            gap: 2,
-            bgcolor: 'secondary',
-          }}
-        > 
-          <TextField 
-            label="Username" 
-            variant="filled"
-            value={username}
-            onChange={handleUsernameChange}
-            autoComplete="username"
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <AccountCircle />
-                </InputAdornment>
-              ),
-            }} 
-          />
-          <TextField 
-            label="Password" 
-            variant="filled"
-            type="password"
-            value={password}
-            onChange={handlePasswordChange} 
-            autoComplete="current-password"
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <Password />
-                </InputAdornment>
-              ),
-            }} 
-          />
-        </Box>
-      </form>
+        id="login-form"
+        onSubmit={handleSubmit}
+      > 
+        <TextField 
+          label="Username" 
+          variant="filled"
+          value={username}
+          onChange={handleUsernameChange}
+          autoComplete="username"
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <AccountCircle />
+              </InputAdornment>
+            ),
+          }} 
+        />
+        <TextField 
+          label="Password" 
+          variant="filled"
+          type="password"
+          value={password}
+          onChange={handlePasswordChange} 
+          autoComplete="current-password"
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <Password />
+              </InputAdornment>
+            ),
+          }} 
+        />
+      </Box>
       <Box
         sx={{
           display: 'flex',
