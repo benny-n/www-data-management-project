@@ -25,6 +25,7 @@ def init(app):
     with app.app_context():
         db.init_app(app)
         db.create_all()
+        db.session.commit()
 
 
 def add_user(chat_id: int):
