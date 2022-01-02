@@ -1,34 +1,37 @@
-import React from 'react';
-import './App.css';
-import './theme'
-import {Box, CssBaseline, ThemeProvider} from '@mui/material'
-import NavBar from './NavBar';
-import LoginForm from './LoginForm';
-import { getAppTheme } from './theme';
+import React from "react";
+import "./App.css";
+import "./theme";
+import { Box, CssBaseline, ThemeProvider } from "@mui/material";
+import NavBar from "./NavBar";
+import LoginForm from "./LoginForm";
+import { getAppTheme } from "./theme";
 
-export const ColorModeContext = React.createContext({ toggleColorMode: () => {} });
+export const ColorModeContext = React.createContext({
+  toggleColorMode: () => {},
+});
 
 function App() {
-
   return (
-      <div>
-        <NavBar />
-        <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
-          <LoginForm />
-        </Box>
-      </div>
+    <div>
+      <NavBar />
+      <Box
+        sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}
+      >
+        <LoginForm />
+      </Box>
+    </div>
   );
 }
 
 export default function ToggleColorMode() {
-  const [mode, setMode] = React.useState<'light' | 'dark'>('light');
+  const [mode, setMode] = React.useState<"light" | "dark">("light");
   const colorMode = React.useMemo(
     () => ({
       toggleColorMode: () => {
-        setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'));
+        setMode((prevMode) => (prevMode === "light" ? "dark" : "light"));
       },
     }),
-    [],
+    []
   );
 
   const theme = React.useMemo(() => getAppTheme(mode), [mode]);
