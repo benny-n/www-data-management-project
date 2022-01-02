@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 def register(update: Update, _) -> None:
 
     response = requests.post(
-        f"http://localhost:5000/register",
+        f"http://localhost:5000/user/register",
         params={"chat_id": update.effective_chat.id}
     )
     update.message.reply_text(response.text)
@@ -26,7 +26,7 @@ def register(update: Update, _) -> None:
 def remove(update: Update, _) -> None:
 
     response = requests.delete(
-        "http://localhost:5000/remove",
+        "http://localhost:5000/user/remove",
         params={"chat_id": update.effective_chat.id}
     )
     update.message.reply_text(response.text)

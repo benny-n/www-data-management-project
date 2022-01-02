@@ -1,4 +1,6 @@
+from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import generate_password_hash, check_password_hash
 
 db = SQLAlchemy()
 
@@ -6,6 +8,10 @@ db = SQLAlchemy()
 class DbError(Exception):
     def __init__(self):
         self.message = ''
+
+
+class DbErrorNotExist(DbError):
+    pass
 
 
 class DbErrorDelete(DbError):
@@ -19,6 +25,15 @@ class DbErrorDeleteBeforeRegister(DbErrorDelete):
 
 class User(db.Model):
     chat_id = db.Column(db.Integer, primary_key=True)
+
+
+class Admin(db.Model):
+
+    username = db.Column(db.String(64), primary_key=True)
+    password_hash = db.Column(db.String(128))
+
+    def verify_password(self, password) -> bool:
+        return check_password_hash(self.password_hash, password)
 
 
 def init(app):
@@ -51,3 +66,19 @@ def delete_user(chat_id: int):
         db.session.rollback()
         raise
 
+
+def add_admin(username, password):
+    try:
+        db.session.add(Admin(username=username, password_hash=generate_password_hash(password)))
+        db.session.commit()
+
+    except Exception:
+        db.session.rollback()
+        raise
+
+
+def get_admin(username):
+    admin = Admin.query.filter_by(username=username).first()
+    if admin is None:
+        raise DbErrorNotExist
+    return admin
