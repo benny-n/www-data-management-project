@@ -6,6 +6,7 @@ import { Box, CssBaseline, ThemeProvider } from "@mui/material";
 import PollCard from "./components/PollCard";
 import NavBar from "./components/NavBar";
 import LoginForm from "./components/LoginForm";
+import { QueryClient, QueryClientProvider } from "react-query";
 
 export const ColorModeContext = React.createContext({
   toggleColorMode: () => {},
@@ -37,12 +38,15 @@ export default function ToggleColorMode() {
   );
 
   const theme = React.useMemo(() => getAppTheme(mode), [mode]);
+  const queryClient = new QueryClient();
 
   return (
     <ColorModeContext.Provider value={colorMode}>
       <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <App />
+        <QueryClientProvider client={queryClient}>
+          <CssBaseline />
+          <App />
+        </QueryClientProvider>
       </ThemeProvider>
     </ColorModeContext.Provider>
   );

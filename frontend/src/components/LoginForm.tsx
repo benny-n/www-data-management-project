@@ -1,32 +1,47 @@
 import { AccountCircle, Password } from "@mui/icons-material";
-import { Box, Button, InputAdornment, TextField } from "@mui/material";
+import { LoadingButton } from "@mui/lab";
+import { Box, InputAdornment, TextField, Typography } from "@mui/material";
 import React from "react";
+import { useQuery } from "react-query";
+import { login } from "../api";
 
 const LoginForm: React.FC = () => {
   const [username, setUsername] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [usernameEmptyError, setUsernameEmptyError] = React.useState(false);
   const [passwordEmptyError, setPasswordEmptyError] = React.useState(false);
+  const [loginTrigger, setLoginTrigger] = React.useState(false);
+  const { status, remove } = useQuery(
+    "login",
+    () => login(username, password),
+    {
+      enabled: loginTrigger,
+      retry: false,
+    }
+  );
   const handleUsernameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setUsername(event.target.value);
   };
   const handlePasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(event.target.value);
   };
-  const handleSubmit = (event: any) => {
+
+  const handleClickLogin = (event: any) => {
     event.preventDefault();
     setUsernameEmptyError(username === "");
     setPasswordEmptyError(password === "");
     if (!password || !username) return;
-    //TODO remove this log
-    console.log(
-      "LOGIN FORM SAYS:",
-      "Username:",
-      username,
-      "Password: ",
-      password
-    );
+    setLoginTrigger(true);
   };
+
+  React.useEffect(() => {
+    if (status === "error") {
+      setLoginTrigger(false);
+    } else if (status === "success") {
+      setLoginTrigger(false);
+      remove();
+    }
+  }, [status, remove]);
 
   return (
     <div>
@@ -46,10 +61,10 @@ const LoginForm: React.FC = () => {
           bgcolor: "secondary",
         }}
         id="login-form"
-        onSubmit={handleSubmit}
+        onSubmit={handleClickLogin}
       >
         <TextField
-          error={usernameEmptyError}
+          error={usernameEmptyError || status === "error"}
           label="Username"
           variant="filled"
           value={username}
@@ -65,14 +80,20 @@ const LoginForm: React.FC = () => {
           }}
         />
         <TextField
-          error={passwordEmptyError}
+          error={passwordEmptyError || status === "error"}
           label="Password"
           variant="filled"
           type="password"
           value={password}
           onChange={handlePasswordChange}
           autoComplete="current-password"
-          helperText={passwordEmptyError ? "Please enter a password." : ""}
+          helperText={
+            passwordEmptyError
+              ? "Please enter a password."
+              : status === "error"
+              ? "Incorrect username or password!"
+              : ""
+          }
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -95,15 +116,17 @@ const LoginForm: React.FC = () => {
           bgcolor: "secondary",
         }}
       >
-        <Button
+        <LoadingButton
           type="submit"
           form="login-form"
           sx={{ width: "50%" }}
           size="large"
+          onClick={handleClickLogin}
+          loading={status === "loading"}
           variant="contained"
         >
-          LOGIN
-        </Button>
+          Login
+        </LoadingButton>
       </Box>
     </div>
   );

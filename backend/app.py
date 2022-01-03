@@ -1,5 +1,6 @@
 import requests
 from flask import Flask, request, Response, jsonify
+from flask_cors import CORS, cross_origin
 from sqlalchemy.exc import IntegrityError
 from werkzeug.exceptions import InternalServerError
 from uuid import uuid4 as generate_uid
@@ -33,10 +34,11 @@ def remove_user(chat_id):
 
 
 @app.route('/login', methods=['POST'])
+@cross_origin()
 def login():
     try:
-        username = request.args.get("username")
-        password = request.args.get("password")
+        username = request.json["username"]
+        password = request.json["password"]
         admin = db.get_admin(username)
         if not admin.verify_password(password):
             return Response(status=401)
@@ -44,6 +46,9 @@ def login():
     except DbErrorNotExist:
         return Response(status=401)
 
+
+# TODO add @cross_origin to anything with @login_required
+# TODO also change request.args.get to request.json
 
 @app.route('/admins', methods=['POST'])
 @auth.login_required
