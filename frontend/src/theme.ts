@@ -13,7 +13,7 @@ export const getAppTheme = (mode: PaletteMode) => {
             divider: lightGreen[200],
             text: {
               primary: grey[800],
-              secondary: grey[800],
+              secondary: grey[600],
             },
             background: {
               default: grey[300],

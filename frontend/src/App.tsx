@@ -5,6 +5,7 @@ import { Box, CssBaseline, ThemeProvider } from "@mui/material";
 import NavBar from "./NavBar";
 import LoginForm from "./LoginForm";
 import { getAppTheme } from "./theme";
+import PollCard from "./PollCard";
 
 export const ColorModeContext = React.createContext({
   toggleColorMode: () => {},
@@ -19,6 +20,7 @@ function App() {
       >
         <LoginForm />
       </Box>
+      <PollCard />
     </div>
   );
 }

@@ -1,4 +1,3 @@
-import { AccountCircle, Password } from "@mui/icons-material";
 import {
   Box,
   Button,
@@ -6,7 +5,6 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  InputAdornment,
   TextField,
 } from "@mui/material";
 import React from "react";

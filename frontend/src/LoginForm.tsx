@@ -1,7 +1,6 @@
 import { AccountCircle, Password } from "@mui/icons-material";
 import { Box, Button, InputAdornment, TextField } from "@mui/material";
 import React from "react";
-import RegisterForm from "./RegisterForm";
 
 const LoginForm: React.FC = () => {
   const [username, setUsername] = React.useState("");
@@ -78,6 +77,7 @@ const LoginForm: React.FC = () => {
         sx={{
           display: "flex",
           flexDirection: "column",
+          alignItems: "center",
           p: 5,
           m: 5,
           marginTop: 0,
@@ -86,25 +86,15 @@ const LoginForm: React.FC = () => {
           bgcolor: "secondary",
         }}
       >
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "space-between",
-            gap: 5,
-          }}
+        <Button
+          type="submit"
+          form="login-form"
+          sx={{ width: "50%" }}
+          size="large"
+          variant="contained"
         >
-          <Button
-            type="submit"
-            form="login-form"
-            sx={{ width: "80%" }}
-            size="large"
-            variant="contained"
-          >
-            LOGIN
-          </Button>
-          <RegisterForm />
-        </div>
+          LOGIN
+        </Button>
       </Box>
     </div>
   );
