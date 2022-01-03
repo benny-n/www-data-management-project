@@ -5,6 +5,8 @@ import React from "react";
 const LoginForm: React.FC = () => {
   const [username, setUsername] = React.useState("");
   const [password, setPassword] = React.useState("");
+  const [usernameEmptyError, setUsernameEmptyError] = React.useState(false);
+  const [passwordEmptyError, setPasswordEmptyError] = React.useState(false);
   const handleUsernameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setUsername(event.target.value);
   };
@@ -13,6 +15,9 @@ const LoginForm: React.FC = () => {
   };
   const handleSubmit = (event: any) => {
     event.preventDefault();
+    setUsernameEmptyError(username === "");
+    setPasswordEmptyError(password === "");
+    if (!password || !username) return;
     //TODO remove this log
     console.log(
       "LOGIN FORM SAYS:",
@@ -44,11 +49,13 @@ const LoginForm: React.FC = () => {
         onSubmit={handleSubmit}
       >
         <TextField
+          error={usernameEmptyError}
           label="Username"
           variant="filled"
           value={username}
           onChange={handleUsernameChange}
           autoComplete="username"
+          helperText={usernameEmptyError ? "Please enter a username." : ""}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -58,12 +65,14 @@ const LoginForm: React.FC = () => {
           }}
         />
         <TextField
+          error={passwordEmptyError}
           label="Password"
           variant="filled"
           type="password"
           value={password}
           onChange={handlePasswordChange}
           autoComplete="current-password"
+          helperText={passwordEmptyError ? "Please enter a password." : ""}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">

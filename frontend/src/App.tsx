@@ -1,11 +1,11 @@
 import React from "react";
 import "./App.css";
 import "./theme";
-import { Box, CssBaseline, ThemeProvider } from "@mui/material";
-import NavBar from "./NavBar";
-import LoginForm from "./LoginForm";
 import { getAppTheme } from "./theme";
-import PollCard from "./PollCard";
+import { Box, CssBaseline, ThemeProvider } from "@mui/material";
+import PollCard from "./components/PollCard";
+import NavBar from "./components/NavBar";
+import LoginForm from "./components/LoginForm";
 
 export const ColorModeContext = React.createContext({
   toggleColorMode: () => {},
