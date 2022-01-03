@@ -3,8 +3,8 @@
 import logging
 import requests
 from backend.config import CONFIG
-from telegram import Update
-from telegram.ext import Updater, CommandHandler
+from telegram import Update, ParseMode
+from telegram.ext import Updater, CommandHandler, PollAnswerHandler, CallbackContext
 
 # Enable logging
 logging.basicConfig(
@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 def register(update: Update, _) -> None:
 
     response = requests.post(
-        f"http://localhost:5000/user/register",
+        f"http://localhost:5000/users",
         params={"chat_id": update.effective_chat.id}
     )
     update.message.reply_text(response.text)
@@ -26,10 +26,23 @@ def register(update: Update, _) -> None:
 def remove(update: Update, _) -> None:
 
     response = requests.delete(
-        "http://localhost:5000/user/remove",
-        params={"chat_id": update.effective_chat.id}
+        f"http://localhost:5000/users/{update.effective_chat.id}"
     )
     update.message.reply_text(response.text)
+
+
+def receive_poll_answer(update: Update, context: CallbackContext) -> None:
+
+    chat_id = update.poll_answer.user.id
+    telegram_id = update.poll_answer.poll_id
+    answer_index = update.poll_answer.option_ids[0]
+
+    response = requests.post(
+        f"http://localhost:5000/user/responses",
+        params={"chat_id": chat_id, "telegram_id": telegram_id, "answer_index": answer_index}
+    )
+    resp_msg = "Something unexpected happened 😵" if response.status_code != 200 else "Thanks for voting!"
+    context.bot.send_message(chat_id, resp_msg, parse_mode=ParseMode.HTML)
 
 
 def bot() -> None:
@@ -41,6 +54,7 @@ def bot() -> None:
     # Add command handlers
     dispatcher.add_handler(CommandHandler("register", register))
     dispatcher.add_handler(CommandHandler("remove", remove))
+    dispatcher.add_handler(PollAnswerHandler(receive_poll_answer))
 
     # Start the Bot
     updater.start_polling()

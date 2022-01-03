@@ -1,5 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import ForeignKeyConstraint
+from sqlalchemy import ForeignKeyConstraint, func
 from werkzeug.security import generate_password_hash, check_password_hash
 
 db = SQLAlchemy()
@@ -28,21 +28,19 @@ class DbErrorDeleteBeforeRegister(DbErrorDelete):
 
 
 class Poll(db.Model):
-    telegram_id = db.Column(db.BigInteger, primary_key=True)
-    uid = db.Column(db.String(POLL_UID_LENGTH))
-
-
-class PollProps(db.Model):
-    poll_uid = db.Column(db.String(POLL_UID_LENGTH), primary_key=True)
+    uid = db.Column(db.String(POLL_UID_LENGTH), primary_key=True)
     question = db.Column(db.String(QUESTION_LENGTH))
-    # TODO do we need these??
-    # is_anonymous = db.Boolean
-    # is_quiz = db.Boolean
 
 
 class PollAnswer(db.Model):
-    poll_uid = db.Column(db.String(POLL_UID_LENGTH), primary_key=True)
-    answer = db.Column(db.String(ANSWER_LENGTH), primary_key=True)
+    uid = db.Column(db.String(POLL_UID_LENGTH), primary_key=True)
+    index = db.Column(db.Integer, primary_key=True)
+    answer = db.Column(db.String(ANSWER_LENGTH))
+
+
+class PollReceiver(db.Model):
+    telegram_id = db.Column(db.BigInteger, primary_key=True)
+    uid = db.Column(db.String(POLL_UID_LENGTH))
 
 
 class User(db.Model):
@@ -52,11 +50,11 @@ class User(db.Model):
 class UserResponse(db.Model):
     chat_id = db.Column(db.BigInteger, primary_key=True)
     poll_uid = db.Column(db.String(POLL_UID_LENGTH), primary_key=True)
-    answer = db.Column(db.String(ANSWER_LENGTH), primary_key=True)
+    index = db.Column(db.Integer, primary_key=True)
     __table_args__ = (
         ForeignKeyConstraint(
-            (poll_uid, answer),
-            [PollAnswer.poll_uid, PollAnswer.answer],
+            (poll_uid, index),
+            [PollAnswer.uid, PollAnswer.index],
             ondelete="CASCADE"
         ),
         ForeignKeyConstraint(
@@ -115,6 +113,11 @@ def delete_user(chat_id: int):
         raise
 
 
+@add_db_model
+def add_user_response(poll_uid, chat_id, index):
+    return UserResponse(poll_uid=poll_uid, chat_id=chat_id, index=index)
+
+
 def get_chat_ids(filters):
     filtered_chat_ids = get_all_chat_ids()
     for poll_uid, answer in filters:
@@ -140,9 +143,25 @@ def get_admin(username):
     return admin
 
 
-def add_poll(telegram_id, uid):
+@add_db_model
+def add_poll(poll_uid, question):
+    return Poll(uid=poll_uid, question=question)
+
+
+@add_db_model
+def add_poll_answer(poll_uid, index, answer):
+    return PollAnswer(uid=poll_uid, index=index, answer=answer)
+
+
+@add_db_model
+def add_poll_receiver(telegram_id, uid):
+    return PollReceiver(telegram_id=telegram_id, uid=uid)
+
+
+def delete_poll_receiver(telegram_id):
     try:
-        db.session.add(Poll(telegram_id=telegram_id, uid=uid))
+        poll_to_delete: PollReceiver = PollReceiver.query.filter_by(telegram_id=telegram_id).first()
+        db.session.delete(poll_to_delete)
         db.session.commit()
 
     except Exception:
@@ -150,18 +169,8 @@ def add_poll(telegram_id, uid):
         raise
 
 
-@add_db_model
-def add_poll_props(poll_uid, question):
-    return PollProps(poll_uid=poll_uid, question=question)
-
-
-@add_db_model
-def add_poll_answer(poll_uid, answer):
-    return PollAnswer(poll_uid=poll_uid, answer=answer)
-
-
 def get_poll_props(poll_uid):
-    poll_props = PollProps.query.filter_by(poll_uid=poll_uid).first()
+    poll_props = Poll.query.filter_by(poll_uid=poll_uid).first()
     if poll_props is None:
         raise DbErrorNotExist
     return poll_props
@@ -172,3 +181,11 @@ def get_answers(poll_uid):
     if answers is None:
         raise DbErrorNotExist
     return answers
+
+
+def get_poll_stats(poll_uid):
+    return db.session.query(UserResponse.poll_uid, PollAnswer.answer, func.count(UserResponse.chat_id))\
+            .join(PollAnswer, (UserResponse.poll_uid == PollAnswer.uid) & (UserResponse.index == PollAnswer.index))\
+            .filter(UserResponse.poll_uid == poll_uid)\
+            .group_by(UserResponse.poll_uid, PollAnswer.answer)\
+            .all()
