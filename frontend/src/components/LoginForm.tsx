@@ -11,14 +11,10 @@ const LoginForm: React.FC = () => {
   const [usernameEmptyError, setUsernameEmptyError] = React.useState(false);
   const [passwordEmptyError, setPasswordEmptyError] = React.useState(false);
   const [loginTrigger, setLoginTrigger] = React.useState(false);
-  const { status, remove } = useQuery(
-    "login",
-    () => login(username, password),
-    {
-      enabled: loginTrigger,
-      retry: false,
-    }
-  );
+  const { status } = useQuery("login", () => login(username, password), {
+    enabled: loginTrigger,
+    retry: false,
+  });
   const handleUsernameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setUsername(event.target.value);
   };
@@ -39,9 +35,10 @@ const LoginForm: React.FC = () => {
       setLoginTrigger(false);
     } else if (status === "success") {
       setLoginTrigger(false);
-      remove();
+      localStorage.setItem("user", `${username}:${password}`);
+      window.location.reload();
     }
-  }, [status, remove]);
+  }, [status]);
 
   return (
     <div>

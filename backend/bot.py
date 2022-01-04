@@ -52,9 +52,9 @@ def bot() -> None:
     dispatcher = updater.dispatcher
 
     # Add command handlers
-    dispatcher.add_handler(CommandHandler("register", register))
-    dispatcher.add_handler(CommandHandler("remove", remove))
-    dispatcher.add_handler(PollAnswerHandler(receive_poll_answer))
+    dispatcher.add_handler(CommandHandler("register", register, run_async=True))
+    dispatcher.add_handler(CommandHandler("remove", remove, run_async=True))
+    dispatcher.add_handler(PollAnswerHandler(receive_poll_answer, run_async=True))
 
     # Start the Bot
     updater.start_polling()

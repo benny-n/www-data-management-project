@@ -2,7 +2,7 @@ import React from "react";
 import "./App.css";
 import "./theme";
 import { getAppTheme } from "./theme";
-import { Box, CssBaseline, ThemeProvider } from "@mui/material";
+import { Box, Button, CssBaseline, ThemeProvider } from "@mui/material";
 import PollCard from "./components/PollCard";
 import NavBar from "./components/NavBar";
 import LoginForm from "./components/LoginForm";
@@ -13,13 +13,32 @@ export const ColorModeContext = React.createContext({
 });
 
 function App() {
+  const [loggedIn, setLoggedIn] = React.useState(false);
+
+  React.useEffect(() => {
+    const loggedInUser = localStorage.getItem("user");
+    setLoggedIn(loggedInUser !== null);
+  }, []);
+
   return (
     <div>
       <NavBar />
       <Box
         sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}
       >
-        <LoginForm />
+        {loggedIn ? (
+          <Button
+            variant="contained"
+            onClick={() => {
+              localStorage.removeItem("user");
+              window.location.reload();
+            }}
+          >
+            Logout
+          </Button>
+        ) : (
+          <LoginForm />
+        )}
       </Box>
       <PollCard />
     </div>
