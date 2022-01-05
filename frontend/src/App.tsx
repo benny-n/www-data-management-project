@@ -7,6 +7,7 @@ import PollCard from "./components/PollCard";
 import NavBar from "./components/NavBar";
 import LoginForm from "./components/LoginForm";
 import { QueryClient, QueryClientProvider } from "react-query";
+import { api_test_with, logout } from "./api";
 
 export const ColorModeContext = React.createContext({
   toggleColorMode: () => {},
@@ -31,7 +32,9 @@ function App() {
             variant="contained"
             onClick={() => {
               localStorage.removeItem("user");
+              logout();
               window.location.reload();
+              api_test_with();
             }}
           >
             Logout

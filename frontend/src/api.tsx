@@ -11,3 +11,11 @@ export const login = async (
     password,
   });
 };
+
+export const logout = async (): Promise<any> => {
+  await axios.get(`${API_URL}/logout`);
+};
+
+export const api_test_with = async (): Promise<any> => {
+  await axios.get(`${API_URL}/test_with`, { withCredentials: true });
+};

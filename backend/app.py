@@ -1,5 +1,5 @@
 import requests
-from flask import Flask, request, Response, jsonify
+from flask import Flask, request, Response, jsonify, session
 from flask_cors import CORS, cross_origin
 from sqlalchemy.exc import IntegrityError
 from werkzeug.exceptions import InternalServerError
@@ -11,6 +11,7 @@ from backend.db import DbErrorDelete, DbErrorNotExist
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = CONFIG.uri()
+app.secret_key = CONFIG.secret
 db.init(app)
 
 
@@ -42,9 +43,17 @@ def login():
         admin = db.get_admin(username)
         if not admin.verify_password(password):
             return Response(status=401)
+        session['credentials'] = f"{username}:{password}"
         return Response()
     except DbErrorNotExist:
         return Response(status=401)
+
+
+@app.route('/logout', methods=['GET'])
+@cross_origin()
+def logout():
+    session.pop('credentials', None)
+    return Response()
 
 
 # TODO add @cross_origin to anything with @login_required
@@ -146,6 +155,24 @@ def receive_user_response():
     except Exception as e:
         print(e)
         raise InternalServerError
+
+
+@app.route('/test_with', methods=['GET'])
+@auth.login_required()
+@cross_origin()
+def test_with():
+    print(session["username"])
+    return Response()
+
+
+@app.route('/test_without', methods=['GET'])
+@cross_origin(supports_credentials=True)
+def test_without():
+    try:
+        print(session["username"])
+    except KeyError:
+        print('omg it works')
+    return Response()
 
 
 if __name__ == '__main__':
