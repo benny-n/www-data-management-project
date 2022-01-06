@@ -14,7 +14,7 @@ import SupervisorAccountIcon from "@mui/icons-material/SupervisorAccount";
 import PollIcon from "@mui/icons-material/Poll";
 import LogoutIcon from "@mui/icons-material/Logout";
 import React from "react";
-import AddAdminForm, { AddAdminFormProps } from "./AddAdminForm";
+import AddAdminDialog, { AddAdminDialogProps } from "./AddAdminDialog";
 
 const drawerWidth = 240;
 
@@ -27,7 +27,7 @@ const AppMenu: React.FC<AppMenuProps> = ({ open, onClose }) => {
   const [addAdminDialogOpen, setAddAdminDialogOpen] = React.useState(false);
   const [addPollDialogOpen, setAddPollDialogOpen] = React.useState(false);
 
-  const addAdminDialogProps: AddAdminFormProps = {
+  const addAdminDialogProps: AddAdminDialogProps = {
     open: addAdminDialogOpen,
     onClose: () => setAddAdminDialogOpen(false),
   };
@@ -72,7 +72,7 @@ const AppMenu: React.FC<AppMenuProps> = ({ open, onClose }) => {
           </ListItemIcon>
           <ListItemText primary="Add new admin" />
         </ListItem>
-        <AddAdminForm {...addAdminDialogProps} />
+        <AddAdminDialog {...addAdminDialogProps} />
         <ListItem button key="Create poll">
           <ListItemIcon>
             <PollIcon />

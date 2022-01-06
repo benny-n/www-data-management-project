@@ -1,20 +1,7 @@
-import {
-  Box,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  TextField,
-} from "@mui/material";
+import { Box, TextField } from "@mui/material";
 import React from "react";
 
-export interface AddAdminFormProps {
-  open: boolean;
-  onClose: () => void;
-}
-
-const AddAdminForm: React.FC<AddAdminFormProps> = ({ open, onClose }) => {
+const AddAdminForm: React.FC = () => {
   const [username, setUsername] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [confirmPassword, setConfirmPassword] = React.useState("");
@@ -51,64 +38,46 @@ const AddAdminForm: React.FC<AddAdminFormProps> = ({ open, onClose }) => {
   };
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth>
-      <DialogTitle>Registration</DialogTitle>
-      <DialogContent>
-        <Box
-          component="form"
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            gap: 2,
-            marginTop: 2,
-          }}
-          id="register-form"
-          onSubmit={handleSubmit}
-        >
-          <TextField
-            error={usernameError}
-            sx={{ marginTop: 5 }}
-            label="Username"
-            variant="outlined"
-            value={username}
-            onChange={handleUsernameChange}
-            autoComplete="username"
-          />
-          <TextField
-            error={confirmPasswordError}
-            label="Password"
-            variant="outlined"
-            type="password"
-            value={password}
-            onChange={handlePasswordChange}
-            autoComplete="new-password"
-          />
-          <TextField
-            error={confirmPasswordError}
-            label="Confirm Password"
-            variant="outlined"
-            type="password"
-            value={confirmPassword}
-            onChange={handleConfirmPasswordChange}
-            autoComplete="new-password"
-            helperText={confirmPasswordError ? "Passwords don't match." : ""}
-          />
-        </Box>
-      </DialogContent>
-      <DialogActions>
-        <Button
-          type="submit"
-          form="register-form"
-          size="medium"
-          variant="contained"
-        >
-          Submit
-        </Button>
-        <Button size="medium" variant="contained" onClick={onClose}>
-          Cancel
-        </Button>
-      </DialogActions>
-    </Dialog>
+    <Box
+      component="form"
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        gap: 2,
+        marginTop: 2,
+      }}
+      id="admin-form"
+      onSubmit={handleSubmit}
+    >
+      <TextField
+        error={usernameError}
+        sx={{ marginTop: 5 }}
+        label="Username"
+        variant="outlined"
+        value={username}
+        onChange={handleUsernameChange}
+        autoComplete="username"
+      />
+      <TextField
+        error={confirmPasswordError}
+        label="Password"
+        variant="outlined"
+        type="password"
+        value={password}
+        onChange={handlePasswordChange}
+        autoComplete="new-password"
+      />
+      <TextField
+        error={confirmPasswordError}
+        label="Confirm Password"
+        variant="outlined"
+        type="password"
+        value={confirmPassword}
+        onChange={handleConfirmPasswordChange}
+        autoComplete="new-password"
+        helperText={confirmPasswordError ? "Passwords don't match." : ""}
+      />
+    </Box>
   );
 };
 
