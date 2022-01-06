@@ -47,9 +47,6 @@ def login():
         return Response(status=401)
 
 
-# TODO add @cross_origin to anything with @login_required
-# TODO also change request.args.get to request.json
-
 @app.route('/admins', methods=['POST'])
 @auth.login_required
 @cross_origin()
@@ -133,6 +130,9 @@ def get_poll_statistics(poll_uid):
         return jsonify(vote_count)
     except Exception:
         raise InternalServerError
+
+
+# TODO get_all_polls 'route: /polls/, method: GET'
 
 
 @app.route('/user/responses', methods=['POST'])
