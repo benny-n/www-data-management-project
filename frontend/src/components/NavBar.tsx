@@ -12,6 +12,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import ThemeButton from "./ThemeButton";
 import React from "react";
 import AppMenu, { AppMenuProps } from "./AppMenu";
+import { UserContext } from "../App";
 
 const drawerWidth = 240;
 
@@ -23,6 +24,8 @@ const NavBar: React.FC<{ loggedIn: boolean }> = ({ loggedIn }) => {
     open: menuOpen,
     onClose: () => setMenuOpen(false),
   };
+
+  const { username } = React.useContext(UserContext);
 
   return (
     <Box
@@ -62,7 +65,7 @@ const NavBar: React.FC<{ loggedIn: boolean }> = ({ loggedIn }) => {
             color="text.primary"
             sx={{ mr: 2, display: { xs: "none", md: "flex" } }}
           >
-            Welcome to Telegram Polls!
+            Hi {username}, Welcome to Telegram Polls!
           </Typography>
           <Box
             sx={{ flexGrow: 1, display: "flex", flexDirection: "row-reverse" }}

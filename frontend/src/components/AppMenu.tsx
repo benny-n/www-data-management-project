@@ -16,6 +16,8 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import React from "react";
 import FormDialog, { FormDialogProps } from "./FormDialog";
 import AddAdminForm from "./AddAdminForm";
+import { logout } from "../api";
+import { UserContext } from "../App";
 
 const drawerWidth = 240;
 
@@ -27,6 +29,8 @@ export interface AppMenuProps {
 const AppMenu: React.FC<AppMenuProps> = ({ open, onClose }) => {
   const [addAdminDialogOpen, setAddAdminDialogOpen] = React.useState(false);
   const [addPollDialogOpen, setAddPollDialogOpen] = React.useState(false);
+
+  const { setLoggedIn, setUsername } = React.useContext(UserContext);
 
   const addAdminDialogProps: FormDialogProps = {
     title: "Register a new admin",
@@ -83,7 +87,17 @@ const AppMenu: React.FC<AppMenuProps> = ({ open, onClose }) => {
           </ListItemIcon>
           <ListItemText primary="Create poll" />
         </ListItem>
-        <ListItem button key="Logout">
+        <ListItem
+          button
+          key="Logout"
+          onClick={() => {
+            localStorage.removeItem("user");
+            logout();
+            setLoggedIn(false);
+            setUsername("");
+            window.location.reload();
+          }}
+        >
           <ListItemIcon>
             <LogoutIcon />
           </ListItemIcon>

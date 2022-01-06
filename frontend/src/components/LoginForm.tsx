@@ -4,6 +4,7 @@ import { Box, InputAdornment, TextField } from "@mui/material";
 import React from "react";
 import { useQuery } from "react-query";
 import { login } from "../api";
+import { UserContext } from "../App";
 
 const LoginForm: React.FC = () => {
   const [username, setUsername] = React.useState("");
@@ -11,6 +12,7 @@ const LoginForm: React.FC = () => {
   const [usernameEmptyError, setUsernameEmptyError] = React.useState(false);
   const [passwordEmptyError, setPasswordEmptyError] = React.useState(false);
   const [loginTrigger, setLoginTrigger] = React.useState(false);
+  const userContext = React.useContext(UserContext);
   const { status } = useQuery("login", () => login(username, password), {
     enabled: loginTrigger,
     retry: false,
@@ -35,7 +37,9 @@ const LoginForm: React.FC = () => {
       setLoginTrigger(false);
     } else if (status === "success") {
       setLoginTrigger(false);
-      localStorage.setItem("user", `${username}:${password}`);
+      localStorage.setItem("user", username);
+      userContext.setLoggedIn(true);
+      userContext.setUsername(username);
       window.location.reload();
     }
   }, [status]);
