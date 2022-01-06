@@ -8,33 +8,32 @@ import LoginForm from "./components/LoginForm";
 import { QueryClient, QueryClientProvider } from "react-query";
 
 interface UserState {
-  loggedIn: boolean;
   username: string;
+  basicAuth: string;
 }
 
 export const UserContext = React.createContext({
   username: "",
-  loggedIn: false,
-  setUsername: (_: string) => {},
-  setLoggedIn: (_: boolean) => {},
+  basicAuth: "",
+  setUserContext: (_: string) => {},
 });
 
 function App() {
-  const loggedInUsername = localStorage.getItem("user");
+  const authString = localStorage.getItem("basicAuth");
   const [userState, setUserState] = React.useState<UserState>({
-    loggedIn: loggedInUsername !== null,
-    username: loggedInUsername ? loggedInUsername : "",
+    username: authString ? window.atob(authString).split(":")[0] : "",
+    basicAuth: authString ? authString : "",
   });
 
   const userContextValue = React.useMemo(
     () => ({
       username: userState.username,
-      loggedIn: userState.loggedIn,
-      setUsername: (username: string) => {
-        setUserState({ loggedIn: true, username });
-      },
-      setLoggedIn: (state: boolean) => {
-        setUserState({ loggedIn: state, username: "" });
+      basicAuth: userState.basicAuth,
+      setUserContext: (basicAuth: string) => {
+        setUserState({
+          username: basicAuth ? window.atob(basicAuth).split(":")[0] : "",
+          basicAuth,
+        });
       },
     }),
     [userState]
@@ -42,11 +41,11 @@ function App() {
 
   return (
     <UserContext.Provider value={userContextValue}>
-      <NavBar loggedIn={userState.loggedIn} />
+      <NavBar loggedIn={userState.basicAuth !== ""} />
       <Box
         sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}
       >
-        {userState.loggedIn ? <></> : <LoginForm />}
+        {userState.basicAuth !== "" ? <></> : <LoginForm />}
       </Box>
     </UserContext.Provider>
   );

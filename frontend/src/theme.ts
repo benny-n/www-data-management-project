@@ -17,7 +17,7 @@ export const getAppTheme = (mode: PaletteMode) => {
             },
             background: {
               default: grey[300],
-              paper: grey[300],
+              paper: "#d8d8d8",
             },
           }
         : {

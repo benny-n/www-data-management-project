@@ -14,13 +14,19 @@ import SupervisorAccountIcon from "@mui/icons-material/SupervisorAccount";
 import PollIcon from "@mui/icons-material/Poll";
 import LogoutIcon from "@mui/icons-material/Logout";
 import React from "react";
-import FormDialog, { FormDialogProps } from "./FormDialog";
 import AddAdminForm from "./AddAdminForm";
 import { logout } from "../api";
 import { UserContext } from "../App";
 import AddPollForm from "./AddPollForm";
 
 const drawerWidth = 240;
+
+export interface FormDialogProps {
+  title: string;
+  formId: string;
+  open: boolean;
+  onClose: () => void;
+}
 
 export interface AppMenuProps {
   open: boolean;
@@ -31,29 +37,26 @@ const AppMenu: React.FC<AppMenuProps> = ({ open, onClose }) => {
   const [addAdminDialogOpen, setAddAdminDialogOpen] = React.useState(false);
   const [addPollDialogOpen, setAddPollDialogOpen] = React.useState(false);
 
-  const { setLoggedIn, setUsername } = React.useContext(UserContext);
+  const { setUserContext } = React.useContext(UserContext);
 
-  const addAdminDialogProps: FormDialogProps = {
+  const addAdminFormProps: FormDialogProps = {
     title: "Register a new admin",
     formId: "admin-form",
     open: addAdminDialogOpen,
     onClose: () => setAddAdminDialogOpen(false),
-    component: AddAdminForm,
   };
 
-  const addPollDialogProps: FormDialogProps = {
+  const addPollFormProps: FormDialogProps = {
     title: "Create a new poll",
     formId: "poll-form",
     open: addPollDialogOpen,
     onClose: () => setAddPollDialogOpen(false),
-    component: AddPollForm,
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("user");
+    localStorage.removeItem("basicAuth");
     logout();
-    setLoggedIn(false);
-    setUsername("");
+    setUserContext("");
     window.location.reload();
   };
 
@@ -61,7 +64,6 @@ const AppMenu: React.FC<AppMenuProps> = ({ open, onClose }) => {
     <Drawer
       sx={{
         width: drawerWidth,
-        bgcolor: "background.paper",
         flexShrink: 0,
         "& .MuiDrawer-paper": {
           width: drawerWidth,
@@ -97,7 +99,7 @@ const AppMenu: React.FC<AppMenuProps> = ({ open, onClose }) => {
           </ListItemIcon>
           <ListItemText primary="Add new admin" />
         </ListItem>
-        <FormDialog {...addAdminDialogProps} />
+        <AddAdminForm {...addAdminFormProps} />
         <ListItem
           button
           key="Create poll"
@@ -108,7 +110,7 @@ const AppMenu: React.FC<AppMenuProps> = ({ open, onClose }) => {
           </ListItemIcon>
           <ListItemText primary="Create poll" />
         </ListItem>
-        <FormDialog {...addPollDialogProps} />
+        <AddPollForm {...addPollFormProps} />
         <ListItem button key="Logout" onClick={handleLogout}>
           <ListItemIcon>
             <LogoutIcon />

@@ -1,6 +1,11 @@
 import {
   Alert,
   Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   IconButton,
   Snackbar,
   TextField,
@@ -12,6 +17,8 @@ import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
 import FilterAltIcon from "@mui/icons-material/FilterAlt";
 import Slide, { SlideProps } from "@mui/material/Slide";
 import React from "react";
+import { FormDialogProps } from "./AppMenu";
+import { LoadingButton } from "@mui/lab";
 
 const questionMaxLength = 300;
 const answerMaxLength = 100;
@@ -39,7 +46,7 @@ const TransitionDown = (props: SlideProps) => {
   return <Slide {...props} direction="down" />;
 };
 
-const AddPollForm: React.FC = () => {
+const AddPollForm: React.FC<FormDialogProps> = (props) => {
   //const [filters, setFilters] = React.useState<Filter[]>([]); //TODO implement filters
   const [question, setQuestion] = React.useState("");
   const [answers, setAnswers] = React.useState(["", ""]);
@@ -102,99 +109,119 @@ const AddPollForm: React.FC = () => {
   };
 
   return (
-    <Box
-      component="form"
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        gap: 1,
-        marginTop: 2,
-      }}
-      id="poll-form"
-      onSubmit={() => {
-        console.log("submit");
-      }}
-    >
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
-          marginTop: 2,
-        }}
-      >
-        <TextField
-          sx={{ width: "80%" }}
-          error={questionError}
-          label="Poll Question"
-          variant="outlined"
-          value={question}
-          helperText={questionError ? questionLengthErrorMessage : ""}
-          onChange={handleQuestionChange}
-        />
-        <Box sx={{ flexDirection: "row" }}>
-          <Tooltip title={"Add Answer"} TransitionComponent={Zoom}>
-            <IconButton
-              sx={{ padding: "5px" }}
-              size="large"
-              onClick={handleAddAnswer}
-            >
-              <AddCircleIcon />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title={"Remove Answer"} TransitionComponent={Zoom}>
-            <IconButton
-              sx={{ padding: "5px" }}
-              size="large"
-              onClick={handleRemoveAnswer}
-            >
-              <RemoveCircleIcon />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title={"Add Filter"} TransitionComponent={Zoom}>
-            <IconButton sx={{ padding: "5px" }} size="large">
-              <FilterAltIcon />
-            </IconButton>
-          </Tooltip>
+    <Dialog open={props.open} onClose={props.onClose} fullWidth>
+      <DialogTitle>{props.title}</DialogTitle>
+      <DialogContent>
+        <Box
+          component="form"
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 1,
+            marginTop: 2,
+          }}
+          id="poll-form"
+          onSubmit={() => {
+            console.log("submit");
+          }}
+        >
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+              marginTop: 2,
+            }}
+          >
+            <TextField
+              sx={{ width: "80%" }}
+              error={questionError}
+              label="Poll Question"
+              variant="outlined"
+              value={question}
+              helperText={questionError ? questionLengthErrorMessage : ""}
+              onChange={handleQuestionChange}
+            />
+            <Box sx={{ flexDirection: "row" }}>
+              <Tooltip title={"Add Answer"} TransitionComponent={Zoom}>
+                <IconButton
+                  sx={{ padding: "5px" }}
+                  size="large"
+                  onClick={handleAddAnswer}
+                >
+                  <AddCircleIcon />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title={"Remove Answer"} TransitionComponent={Zoom}>
+                <IconButton
+                  sx={{ padding: "5px" }}
+                  size="large"
+                  onClick={handleRemoveAnswer}
+                >
+                  <RemoveCircleIcon />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title={"Add Filter"} TransitionComponent={Zoom}>
+                <IconButton sx={{ padding: "5px" }} size="large">
+                  <FilterAltIcon />
+                </IconButton>
+              </Tooltip>
+            </Box>
+          </Box>
+          {answers.map((_, index) => (
+            <TextField
+              key={index}
+              sx={{ margin: 0.1, width: "60%" }}
+              error={answerErrors[index] === AnswerError.TooLong}
+              label={`Poll Answer ${index + 1}`}
+              variant="outlined"
+              value={answers[index]}
+              helperText={
+                answerErrors[index] === AnswerError.TooLong
+                  ? answerLengthErrorMessage
+                  : ""
+              }
+              onChange={(e) => handleAnswerChange(e, index)}
+            />
+          ))}
+          <Snackbar
+            anchorOrigin={{ vertical: "top", horizontal: "center" }}
+            open={answerAlertOpen}
+            onClose={handleCloseAlert}
+            autoHideDuration={1500}
+            TransitionComponent={TransitionDown}
+          >
+            {answerAlert === AnswerError.TooMany ? (
+              <Alert onClose={handleCloseAlert} severity="error">
+                {answerTooManyErrorMessage}
+              </Alert>
+            ) : answerAlert === AnswerError.NotEnough ? (
+              <Alert onClose={handleCloseAlert} severity="error">
+                {answerNotEnoughErrorMessage}
+              </Alert>
+            ) : (
+              <Alert />
+            )}
+          </Snackbar>
         </Box>
-      </Box>
-      {answers.map((_, index) => (
-        <TextField
-          key={index}
-          sx={{ margin: 0.1, width: "60%" }}
-          error={answerErrors[index] === AnswerError.TooLong}
-          label={`Poll Answer ${index + 1}`}
-          variant="outlined"
-          value={answers[index]}
-          helperText={
-            answerErrors[index] === AnswerError.TooLong
-              ? answerLengthErrorMessage
-              : ""
-          }
-          onChange={(e) => handleAnswerChange(e, index)}
-        />
-      ))}
-      <Snackbar
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-        open={answerAlertOpen}
-        onClose={handleCloseAlert}
-        autoHideDuration={1500}
-        TransitionComponent={TransitionDown}
-      >
-        {answerAlert === AnswerError.TooMany ? (
-          <Alert onClose={handleCloseAlert} severity="error">
-            {answerTooManyErrorMessage}
-          </Alert>
-        ) : answerAlert === AnswerError.NotEnough ? (
-          <Alert onClose={handleCloseAlert} severity="error">
-            {answerNotEnoughErrorMessage}
-          </Alert>
-        ) : (
-          <Alert />
-        )}
-      </Snackbar>
-    </Box>
+      </DialogContent>
+      <DialogActions>
+        <LoadingButton
+          type="submit"
+          form={props.formId}
+          size="medium"
+          onClick={() => {}} //TODO
+          loading={false} //TODO
+          variant="contained"
+        >
+          Submit
+        </LoadingButton>
+        <Button size="medium" variant="contained" onClick={props.onClose}>
+          Cancel
+        </Button>
+      </DialogActions>
+    </Dialog>
   );
 };
 

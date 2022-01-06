@@ -119,11 +119,15 @@ def add_user_response(poll_uid, chat_id, index):
 
 
 def get_chat_ids(filters):
-    filtered_chat_ids = get_all_chat_ids()
+    filtered_chat_ids = set(get_all_chat_ids())
     for poll_uid, answer in filters:
-        filtered_chat_ids = set(filtered_chat_ids) & set([user_response.chat_id for user_response in
-                                                          UserResponse.query.filter_by(poll_uid=poll_uid,
-                                                                                       answer=answer)])
+        filtered_chat_ids &= set(
+            [user_response.chat_id for user_response in
+             UserResponse.query.filter_by(
+                 poll_uid=poll_uid,
+                 answer=answer)
+             ]
+        )
     return filtered_chat_ids
 
 
@@ -184,8 +188,8 @@ def get_answers(poll_uid):
 
 
 def get_poll_stats(poll_uid):
-    return db.session.query(UserResponse.poll_uid, PollAnswer.answer, func.count(UserResponse.chat_id))\
-            .join(PollAnswer, (UserResponse.poll_uid == PollAnswer.uid) & (UserResponse.index == PollAnswer.index))\
-            .filter(UserResponse.poll_uid == poll_uid)\
-            .group_by(UserResponse.poll_uid, PollAnswer.answer)\
-            .all()
+    return db.session.query(UserResponse.poll_uid, PollAnswer.answer, func.count(UserResponse.chat_id)) \
+        .join(PollAnswer, (UserResponse.poll_uid == PollAnswer.uid) & (UserResponse.index == PollAnswer.index)) \
+        .filter(UserResponse.poll_uid == poll_uid) \
+        .group_by(UserResponse.poll_uid, PollAnswer.answer) \
+        .all()

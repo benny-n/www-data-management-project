@@ -52,10 +52,11 @@ def login():
 
 @app.route('/admins', methods=['POST'])
 @auth.login_required
+@cross_origin()
 def register_admin():
     try:
-        username = request.args.get("username")
-        password = request.args.get("password")
+        username = request.json["username"]
+        password = request.json["password"]
         db.add_admin(username=username, password=password)
         return Response()
     except IntegrityError:
@@ -82,11 +83,12 @@ def send_poll(uid, question, answers, filters=None):
 
 @app.route('/polls', methods=['POST'])
 @auth.login_required
+@cross_origin()
 def send_new_poll():
     try:
-        question = request.args.get("question")
-        answers = request.args.get("answers")
-        filters = request.args.get("filters")
+        question = request.json["question"]
+        answers = request.json["answers"]
+        filters = request.json["filters"]  # TODO if doesn't exist, exception, or None?
         uid = generate_uid()
 
         db.add_poll(poll_uid=uid, question=question)
@@ -104,9 +106,10 @@ def send_new_poll():
 
 @app.route('/polls/<poll_uid>', methods=['PUT'])
 @auth.login_required
+@cross_origin()
 def send_existing_poll(poll_uid):
     try:
-        filters = request.args.get("filters")
+        filters = request.json["filters"]
         props = db.get_poll_props(poll_uid)
         answers = db.get_answers(poll_uid)
 
@@ -123,6 +126,7 @@ def send_existing_poll(poll_uid):
 
 @app.route('/polls/<poll_uid>/stats', methods=['GET'])
 @auth.login_required
+@cross_origin()
 def get_poll_statistics(poll_uid):
     try:
         vote_count = {answer: votes for _, answer, votes, in db.get_poll_stats(poll_uid)}

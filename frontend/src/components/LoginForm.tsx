@@ -12,7 +12,7 @@ const LoginForm: React.FC = () => {
   const [usernameEmptyError, setUsernameEmptyError] = React.useState(false);
   const [passwordEmptyError, setPasswordEmptyError] = React.useState(false);
   const [loginTrigger, setLoginTrigger] = React.useState(false);
-  const userContext = React.useContext(UserContext);
+  const { setUserContext } = React.useContext(UserContext);
   const { status } = useQuery("login", () => login(username, password), {
     enabled: loginTrigger,
     retry: false,
@@ -37,12 +37,12 @@ const LoginForm: React.FC = () => {
       setLoginTrigger(false);
     } else if (status === "success") {
       setLoginTrigger(false);
-      localStorage.setItem("user", username);
-      userContext.setLoggedIn(true);
-      userContext.setUsername(username);
+      const basicAuth = window.btoa(`${username}:${password}`);
+      localStorage.setItem("basicAuth", basicAuth);
+      setUserContext(basicAuth);
       window.location.reload();
     }
-  }, [status, userContext, username]);
+  }, [status, username, password, setUserContext]);
 
   return (
     <div>
