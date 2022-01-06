@@ -6,30 +6,32 @@ import {
   DialogTitle,
 } from "@mui/material";
 import React from "react";
-import AddAdminForm from "./AddAdminForm";
 
-export interface AddAdminDialogProps {
+export interface FormDialogProps {
+  title: string;
+  formId: string;
   open: boolean;
   onClose: () => void;
+  component: React.FC;
 }
 
-const AddAdminDialog: React.FC<AddAdminDialogProps> = ({ open, onClose }) => {
+const FormDialog: React.FC<FormDialogProps> = (props) => {
   return (
-    <Dialog open={open} onClose={onClose} fullWidth>
-      <DialogTitle>Registration</DialogTitle>
+    <Dialog open={props.open} onClose={props.onClose} fullWidth>
+      <DialogTitle>{props.title}</DialogTitle>
       <DialogContent>
-        <AddAdminForm />
+        <props.component />
       </DialogContent>
       <DialogActions>
         <Button
           type="submit"
-          form="admin-form"
+          form={props.formId}
           size="medium"
           variant="contained"
         >
           Submit
         </Button>
-        <Button size="medium" variant="contained" onClick={onClose}>
+        <Button size="medium" variant="contained" onClick={props.onClose}>
           Cancel
         </Button>
       </DialogActions>
@@ -37,4 +39,4 @@ const AddAdminDialog: React.FC<AddAdminDialogProps> = ({ open, onClose }) => {
   );
 };
 
-export default AddAdminDialog;
+export default FormDialog;
