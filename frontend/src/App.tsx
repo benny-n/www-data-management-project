@@ -3,18 +3,13 @@ import "./App.css";
 import "./theme";
 import { getAppTheme } from "./theme";
 import { Box, Button, CssBaseline, ThemeProvider } from "@mui/material";
-import PollCard from "./components/PollCard";
 import NavBar from "./components/NavBar";
 import LoginForm from "./components/LoginForm";
 import { QueryClient, QueryClientProvider } from "react-query";
-
-export const ColorModeContext = React.createContext({
-  toggleColorMode: () => {},
-});
+import { logout } from "./api";
 
 function App() {
   const [loggedIn, setLoggedIn] = React.useState(false);
-
   React.useEffect(() => {
     const loggedInUser = localStorage.getItem("user");
     setLoggedIn(loggedInUser !== null);
@@ -22,7 +17,7 @@ function App() {
 
   return (
     <div>
-      <NavBar />
+      <NavBar loggedIn={loggedIn} />
       <Box
         sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}
       >
@@ -31,6 +26,7 @@ function App() {
             variant="contained"
             onClick={() => {
               localStorage.removeItem("user");
+              logout();
               window.location.reload();
             }}
           >
@@ -40,17 +36,26 @@ function App() {
           <LoginForm />
         )}
       </Box>
-      <PollCard />
     </div>
   );
 }
 
-export default function ToggleColorMode() {
-  const [mode, setMode] = React.useState<"light" | "dark">("light");
+export const ColorModeContext = React.createContext({
+  toggleColorMode: () => {},
+});
+
+export default function AppContextProvider() {
+  const [mode, setMode] = React.useState<"dark" | "light">(
+    localStorage.getItem("theme") == "light" ? "light" : "dark"
+  );
   const colorMode = React.useMemo(
     () => ({
       toggleColorMode: () => {
-        setMode((prevMode) => (prevMode === "light" ? "dark" : "light"));
+        setMode((prevMode) => {
+          const currMode = prevMode === "light" ? "dark" : "light";
+          localStorage.setItem("theme", currMode);
+          return currMode;
+        });
       },
     }),
     []

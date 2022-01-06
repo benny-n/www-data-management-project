@@ -11,3 +11,7 @@ export const login = async (
     password,
   });
 };
+
+export const logout = async (): Promise<any> => {
+  await axios.get(`${API_URL}/logout`);
+};

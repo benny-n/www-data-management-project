@@ -10,9 +10,9 @@ export const getAppTheme = (mode: PaletteMode) => {
             // palette values for light mode
             primary: lightGreen,
             secondary: grey,
-            divider: lightGreen[200],
+            divider: lightGreen[500],
             text: {
-              primary: grey[800],
+              primary: grey[900],
               secondary: grey[600],
             },
             background: {
@@ -35,7 +35,7 @@ export const getAppTheme = (mode: PaletteMode) => {
             },
             background: {
               default: grey[800],
-              paper: grey[800],
+              paper: grey[900],
             },
           }),
     },
