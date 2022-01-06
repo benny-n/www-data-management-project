@@ -42,7 +42,7 @@ const LoginForm: React.FC = () => {
       userContext.setUsername(username);
       window.location.reload();
     }
-  }, [status]);
+  }, [status, userContext, username]);
 
   return (
     <div>

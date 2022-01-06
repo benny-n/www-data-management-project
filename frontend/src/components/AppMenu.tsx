@@ -18,6 +18,7 @@ import FormDialog, { FormDialogProps } from "./FormDialog";
 import AddAdminForm from "./AddAdminForm";
 import { logout } from "../api";
 import { UserContext } from "../App";
+import AddPollForm from "./AddPollForm";
 
 const drawerWidth = 240;
 
@@ -38,6 +39,22 @@ const AppMenu: React.FC<AppMenuProps> = ({ open, onClose }) => {
     open: addAdminDialogOpen,
     onClose: () => setAddAdminDialogOpen(false),
     component: AddAdminForm,
+  };
+
+  const addPollDialogProps: FormDialogProps = {
+    title: "Create a new poll",
+    formId: "poll-form",
+    open: addPollDialogOpen,
+    onClose: () => setAddPollDialogOpen(false),
+    component: AddPollForm,
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    logout();
+    setLoggedIn(false);
+    setUsername("");
+    window.location.reload();
   };
 
   return (
@@ -81,23 +98,18 @@ const AppMenu: React.FC<AppMenuProps> = ({ open, onClose }) => {
           <ListItemText primary="Add new admin" />
         </ListItem>
         <FormDialog {...addAdminDialogProps} />
-        <ListItem button key="Create poll">
+        <ListItem
+          button
+          key="Create poll"
+          onClick={() => setAddPollDialogOpen(true)}
+        >
           <ListItemIcon>
             <PollIcon />
           </ListItemIcon>
           <ListItemText primary="Create poll" />
         </ListItem>
-        <ListItem
-          button
-          key="Logout"
-          onClick={() => {
-            localStorage.removeItem("user");
-            logout();
-            setLoggedIn(false);
-            setUsername("");
-            window.location.reload();
-          }}
-        >
+        <FormDialog {...addPollDialogProps} />
+        <ListItem button key="Logout" onClick={handleLogout}>
           <ListItemIcon>
             <LogoutIcon />
           </ListItemIcon>

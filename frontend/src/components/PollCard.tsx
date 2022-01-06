@@ -14,7 +14,7 @@ const TransitionUp = (props: SlideProps) => {
 };
 
 const PollCard = () => {
-  const [open, setOpen] = React.useState(false);
+  const [alertOpen, setAlertOpen] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
 
   const handleClick = () => {
@@ -25,12 +25,12 @@ const PollCard = () => {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-      setOpen(true);
+      setAlertOpen(true);
     }, 2500);
   };
 
   const handleClose = () => {
-    setOpen(false);
+    setAlertOpen(false);
   };
 
   return (
@@ -94,7 +94,7 @@ const PollCard = () => {
         </LoadingButton>
       </CardActions>
       <Snackbar
-        open={open}
+        open={alertOpen}
         onClose={handleClose}
         autoHideDuration={3000}
         TransitionComponent={TransitionUp}

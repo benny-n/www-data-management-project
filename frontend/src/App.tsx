@@ -37,7 +37,7 @@ function App() {
         setUserState({ loggedIn: state, username: "" });
       },
     }),
-    []
+    [userState]
   );
 
   return (
@@ -58,7 +58,7 @@ export const ColorModeContext = React.createContext({
 
 export default function AppContextProvider() {
   const [mode, setMode] = React.useState<"dark" | "light">(
-    localStorage.getItem("theme") == "light" ? "light" : "dark"
+    localStorage.getItem("theme") === "light" ? "light" : "dark"
   );
   const colorMode = React.useMemo(
     () => ({
