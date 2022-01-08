@@ -1,6 +1,6 @@
 import requests
 from flask import Flask, request, Response, jsonify
-from flask_cors import CORS, cross_origin
+from flask_cors import cross_origin
 from sqlalchemy.exc import IntegrityError
 from werkzeug.exceptions import InternalServerError
 from uuid import uuid4 as generate_uid
@@ -128,11 +128,30 @@ def get_poll_statistics(poll_uid):
     try:
         vote_count = {answer: votes for _, answer, votes, in db.get_poll_stats(poll_uid)}
         return jsonify(vote_count)
-    except Exception:
+    except Exception as e:
+        print(e)
         raise InternalServerError
 
 
-# TODO get_all_polls 'route: /polls/, method: GET'
+@app.route('/polls', methods=['GET'])
+@auth.login_required
+@cross_origin()
+def get_all_polls():
+    try:
+        return jsonify(db.get_all_polls())
+    except Exception as e:
+        print(e)
+        raise InternalServerError
+
+#
+# @app.route('/test', methods=['GET'])
+# def test():
+#     try:
+#         a = db.get_all_polls()
+#         return jsonify(a)
+#     except Exception as e:
+#         print(e)
+#         raise InternalServerError
 
 
 @app.route('/user/responses', methods=['POST'])

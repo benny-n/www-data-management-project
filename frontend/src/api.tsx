@@ -1,4 +1,5 @@
 import axios from "axios";
+import { Poll } from "./components/FilterItem";
 
 const API_URL = process.env.REACT_APP_API_URL;
 
@@ -21,7 +22,6 @@ export const register = async (
   password: string,
   authToken: string
 ): Promise<any> => {
-  console.log("http register", username, password);
   await axios.post(
     `${API_URL}/admins`,
     {
@@ -34,4 +34,17 @@ export const register = async (
       },
     }
   );
+};
+
+//TODO maybe give type to return value instead of 'any'
+export const getAllPolls = async (
+  authToken: string
+): Promise<{ polls: Poll[] }> => {
+  return (
+    await axios.get(`${API_URL}/polls`, {
+      headers: {
+        Authorization: `Basic ${authToken}`,
+      },
+    })
+  ).data;
 };

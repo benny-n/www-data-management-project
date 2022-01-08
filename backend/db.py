@@ -193,3 +193,24 @@ def get_poll_stats(poll_uid):
         .filter(UserResponse.poll_uid == poll_uid) \
         .group_by(UserResponse.poll_uid, PollAnswer.answer) \
         .all()
+
+
+def get_all_polls():
+    query_result = db.session.query(Poll.uid, Poll.question, PollAnswer.answer, PollAnswer.index) \
+        .join(PollAnswer, (Poll.uid == PollAnswer.uid)) \
+        .all()
+    polls_dict = {}
+    for uid, question, _, _ in query_result:
+        polls_dict[uid] = {"question": question, "answers": []}
+    for uid, _, answer, index in query_result:
+        polls_dict[uid]["answers"].append((index, answer))
+
+    polls_list = []
+    for uid, poll in polls_dict.items():
+        polls_list.append({
+            "uid": uid,
+            "question": poll["question"],
+            "answers": [answer for _, answer in sorted(poll["answers"], key=lambda x: x[0])]
+        })
+
+    return {"polls": polls_list}

@@ -6,7 +6,9 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  Divider,
   IconButton,
+  MenuItem,
   Snackbar,
   TextField,
   Tooltip,
@@ -19,44 +21,35 @@ import Slide, { SlideProps } from "@mui/material/Slide";
 import React from "react";
 import { FormDialogProps } from "./AppMenu";
 import { LoadingButton } from "@mui/lab";
+import { getAllPolls } from "../api";
+import { useQuery } from "react-query";
+import { UserContext } from "../App";
+import FiltersList from "./FiltersList";
+import { Filter } from "./FilterItem";
 
 const questionMaxLength = 300;
 const answerMaxLength = 100;
-const answerMaxAmount = 10;
-const answerMinAmount = 2;
 const questionLengthErrorMessage = `Question length must be shorter than ${questionMaxLength} characters!`;
 const answerLengthErrorMessage = `Answer length must be shorter than ${answerMaxLength} characters!`;
-const answerTooManyErrorMessage = `Polls can't have more than ${answerMaxAmount} answers!`;
-const answerNotEnoughErrorMessage = `Polls must have at least ${answerMinAmount} answers!`;
-
-//TODO implement filters
-// interface Filter {
-//   question: string;
-//   answer: string;
-// }
 
 enum AnswerError {
   None,
-  NotEnough,
-  TooMany,
   TooLong,
 }
 
-const TransitionDown = (props: SlideProps) => {
-  return <Slide {...props} direction="down" />;
-};
-
 const AddPollForm: React.FC<FormDialogProps> = (props) => {
-  //const [filters, setFilters] = React.useState<Filter[]>([]); //TODO implement filters
+  const [filters, setFilters] = React.useState<Filter[]>([
+    { pollUid: "123", answerIndex: 123 } as Filter,
+    { pollUid: "123", answerIndex: 123 } as Filter,
+    { pollUid: "123", answerIndex: 123 } as Filter,
+  ]); //TODO implement filters
   const [question, setQuestion] = React.useState("");
+  const [questionError, setQuestionError] = React.useState(false);
   const [answers, setAnswers] = React.useState(["", ""]);
   const [answerErrors, setAnswerErrors] = React.useState([
     AnswerError.None,
     AnswerError.None,
   ]);
-  const [answerAlert, setAnswerAlert] = React.useState(AnswerError.None);
-  const [answerAlertOpen, setAnswerAlertOpen] = React.useState(false);
-  const [questionError, setQuestionError] = React.useState(false);
 
   const handleQuestionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.value.length > questionMaxLength) {
@@ -84,28 +77,19 @@ const AddPollForm: React.FC<FormDialogProps> = (props) => {
     setAnswers(answersSlice);
   };
 
-  const handleAddAnswer = () => {
-    const incNumAnswers = answers.length + 1;
-    if (incNumAnswers > answerMaxAmount) {
-      setAnswerAlertOpen(true);
-      setAnswerAlert(AnswerError.TooMany);
-      return;
+  const handleAnswerAmountChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    let answerNum: number = parseInt(event.target.value);
+    let newAnswers = answers.slice();
+    if (answerNum > answers.length) {
+      for (let i = answers.length; i < answerNum; i++) {
+        newAnswers.push("");
+      }
+    } else {
+      newAnswers = answers.slice(0, answerNum);
     }
-    setAnswers(answers.concat(""));
-  };
-
-  const handleRemoveAnswer = () => {
-    const decNumAnswers = answers.length - 1;
-    if (decNumAnswers < answerMinAmount) {
-      setAnswerAlertOpen(true);
-      setAnswerAlert(AnswerError.NotEnough);
-      return;
-    }
-    setAnswers(answers.slice(0, -1));
-  };
-
-  const handleCloseAlert = () => {
-    setAnswerAlertOpen(false);
+    setAnswers(newAnswers);
   };
 
   return (
@@ -117,7 +101,7 @@ const AddPollForm: React.FC<FormDialogProps> = (props) => {
           sx={{
             display: "flex",
             flexDirection: "column",
-            gap: 1,
+            gap: 2,
             marginTop: 2,
           }}
           id="poll-form"
@@ -125,85 +109,58 @@ const AddPollForm: React.FC<FormDialogProps> = (props) => {
             console.log("submit");
           }}
         >
+          <TextField
+            sx={{ width: "80%" }}
+            error={questionError}
+            label="Poll Question"
+            variant="outlined"
+            value={question}
+            helperText={questionError ? questionLengthErrorMessage : ""}
+            onChange={handleQuestionChange}
+          />
+          <Divider />
+          <TextField
+            sx={{ width: "30%" }}
+            select
+            label="Number of poll answers"
+            value={answers.length}
+            onChange={handleAnswerAmountChange}
+            variant="outlined"
+          >
+            {[2, 3, 4].map((num) => (
+              <MenuItem key={num} value={num}>
+                {num}
+              </MenuItem>
+            ))}
+          </TextField>
           <Box
             sx={{
               display: "flex",
               flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-between",
-              marginTop: 2,
+              flexWrap: "wrap",
+              flex: "50%",
+              gap: "5px",
             }}
           >
-            <TextField
-              sx={{ width: "80%" }}
-              error={questionError}
-              label="Poll Question"
-              variant="outlined"
-              value={question}
-              helperText={questionError ? questionLengthErrorMessage : ""}
-              onChange={handleQuestionChange}
-            />
-            <Box sx={{ flexDirection: "row" }}>
-              <Tooltip title={"Add Answer"} TransitionComponent={Zoom}>
-                <IconButton
-                  sx={{ padding: "5px" }}
-                  size="large"
-                  onClick={handleAddAnswer}
-                >
-                  <AddCircleIcon />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title={"Remove Answer"} TransitionComponent={Zoom}>
-                <IconButton
-                  sx={{ padding: "5px" }}
-                  size="large"
-                  onClick={handleRemoveAnswer}
-                >
-                  <RemoveCircleIcon />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title={"Add Filter"} TransitionComponent={Zoom}>
-                <IconButton sx={{ padding: "5px" }} size="large">
-                  <FilterAltIcon />
-                </IconButton>
-              </Tooltip>
-            </Box>
+            {answers.map((_, index) => (
+              <TextField
+                key={index}
+                sx={{ margin: 0.1, width: "49%" }}
+                error={answerErrors[index] === AnswerError.TooLong}
+                label={`Poll Answer ${index + 1}`}
+                variant="outlined"
+                value={answers[index]}
+                helperText={
+                  answerErrors[index] === AnswerError.TooLong
+                    ? answerLengthErrorMessage
+                    : ""
+                }
+                onChange={(e) => handleAnswerChange(e, index)}
+              />
+            ))}
           </Box>
-          {answers.map((_, index) => (
-            <TextField
-              key={index}
-              sx={{ margin: 0.1, width: "60%" }}
-              error={answerErrors[index] === AnswerError.TooLong}
-              label={`Poll Answer ${index + 1}`}
-              variant="outlined"
-              value={answers[index]}
-              helperText={
-                answerErrors[index] === AnswerError.TooLong
-                  ? answerLengthErrorMessage
-                  : ""
-              }
-              onChange={(e) => handleAnswerChange(e, index)}
-            />
-          ))}
-          <Snackbar
-            anchorOrigin={{ vertical: "top", horizontal: "center" }}
-            open={answerAlertOpen}
-            onClose={handleCloseAlert}
-            autoHideDuration={1500}
-            TransitionComponent={TransitionDown}
-          >
-            {answerAlert === AnswerError.TooMany ? (
-              <Alert onClose={handleCloseAlert} severity="error">
-                {answerTooManyErrorMessage}
-              </Alert>
-            ) : answerAlert === AnswerError.NotEnough ? (
-              <Alert onClose={handleCloseAlert} severity="error">
-                {answerNotEnoughErrorMessage}
-              </Alert>
-            ) : (
-              <Alert />
-            )}
-          </Snackbar>
+          <Divider />
+          <FiltersList {...{ filters, setFilters }} />
         </Box>
       </DialogContent>
       <DialogActions>
