@@ -15,11 +15,14 @@ import { UserContext } from "../App";
 import { FormDialogProps } from "./AppMenu";
 
 const AddAdminForm: React.FC<FormDialogProps> = (props) => {
+  const passwordMinLength: number = 5;
   const [username, setUsername] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [confirmPassword, setConfirmPassword] = React.useState("");
-  const [usernameError, setUsernameError] = React.useState(false);
   const [confirmPasswordError, setConfirmPasswordError] = React.useState(false);
+  const [lengthPasswordError, setlengthPasswordError] = React.useState(false);
+  const [firstCharLetterError, setfirstCharLetterError] = React.useState(false);
+  const [specialCharactersError, setSpecialCharactersError] = React.useState(false);
   const [registerTrigger, setRegisterTrigger] = React.useState(false);
   const { basicAuth } = React.useContext(UserContext);
   const { status } = useQuery(
@@ -32,12 +35,14 @@ const AddAdminForm: React.FC<FormDialogProps> = (props) => {
   );
 
   const handleUsernameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setfirstCharLetterError(!(event.target.value.charAt(0).match(/[a-z]/i)));
+    setSpecialCharactersError(!(event.target.value.match(/^[a-z0-9]*$/i)));
     setUsername(event.target.value);
-    setUsernameError(event.target.value === "bad-username");
   };
 
   const handlePasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(event.target.value);
+    setlengthPasswordError(event.target.value.length < passwordMinLength);
     setConfirmPasswordError(event.target.value !== confirmPassword);
   };
 
@@ -51,8 +56,19 @@ const AddAdminForm: React.FC<FormDialogProps> = (props) => {
   const handleClickRegister = () => {
     // setUsernameEmptyError(username === "");
     // setPasswordEmptyError(password === "");
-    if (!password || !username) return;
+    // if (!password || !username) return;
     setRegisterTrigger(true);
+  };
+
+  const handleClickCancel = () => {
+    setUsername("");
+    setPassword("");
+    setConfirmPassword("");
+    setConfirmPasswordError(false);
+    setlengthPasswordError(false);
+    setfirstCharLetterError(false);
+    setSpecialCharactersError(false);
+    props.onClose();
   };
 
   React.useEffect(() => {
@@ -83,22 +99,25 @@ const AddAdminForm: React.FC<FormDialogProps> = (props) => {
           onSubmit={handleClickRegister}
         >
           <TextField
-            error={usernameError}
+            error={firstCharLetterError || specialCharactersError}
             sx={{ marginTop: 5 }}
             label="Username"
             variant="outlined"
             value={username}
             onChange={handleUsernameChange}
             autoComplete="username"
+            helperText={firstCharLetterError ? "First character of username must be a letter." : 
+                        (specialCharactersError ? "Username must contain only letters and digits." : "")}
           />
           <TextField
-            error={confirmPasswordError}
+            error={confirmPasswordError || lengthPasswordError}
             label="Password"
             variant="outlined"
             type="password"
             value={password}
             onChange={handlePasswordChange}
             autoComplete="new-password"
+            helperText={lengthPasswordError ? "Password must be at least 5 characters." : ""}
           />
           <TextField
             error={confirmPasswordError}
@@ -120,10 +139,11 @@ const AddAdminForm: React.FC<FormDialogProps> = (props) => {
           onClick={handleClickRegister}
           loading={status === "loading"}
           variant="contained"
+          disabled={!username || !password || confirmPasswordError || firstCharLetterError || specialCharactersError || lengthPasswordError}
         >
           Submit
         </LoadingButton>
-        <Button size="medium" variant="contained" onClick={props.onClose}>
+        <Button size="medium" variant="contained" onClick={handleClickCancel}>
           Cancel
         </Button>
       </DialogActions>
