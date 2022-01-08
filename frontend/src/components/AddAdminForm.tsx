@@ -14,15 +14,28 @@ import { register } from "../api";
 import { UserContext } from "../App";
 import { FormDialogProps } from "./AppMenu";
 
+enum UsernameError {
+  None,
+  Empty,
+  FirstCharDigit,
+  ContainsSpecialChars,
+}
+
+const passwordMinLength = 5;
+enum PasswordError {
+  None,
+  TooShort,
+  DoNotMatch,
+}
+
 const AddAdminForm: React.FC<FormDialogProps> = (props) => {
-  const passwordMinLength: number = 5;
   const [username, setUsername] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [confirmPassword, setConfirmPassword] = React.useState("");
-  const [confirmPasswordError, setConfirmPasswordError] = React.useState(false);
-  const [lengthPasswordError, setlengthPasswordError] = React.useState(false);
-  const [firstCharLetterError, setfirstCharLetterError] = React.useState(false);
-  const [specialCharactersError, setSpecialCharactersError] = React.useState(false);
+
+  const [passwordError, setPasswordError] = React.useState(PasswordError.None);
+  const [usernameError, setUsernameError] = React.useState(UsernameError.None);
+
   const [registerTrigger, setRegisterTrigger] = React.useState(false);
   const { basicAuth } = React.useContext(UserContext);
   const { status } = useQuery(
@@ -35,28 +48,59 @@ const AddAdminForm: React.FC<FormDialogProps> = (props) => {
   );
 
   const handleUsernameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setfirstCharLetterError(!(event.target.value.charAt(0).match(/[a-z]/i)));
-    setSpecialCharactersError(!(event.target.value.match(/^[a-z0-9]*$/i)));
+    !event.target.value
+      ? setUsernameError(UsernameError.Empty)
+      : !event.target.value.charAt(0).match(/[a-z]/i)
+      ? setUsernameError(UsernameError.FirstCharDigit)
+      : !event.target.value.match(/^[a-z0-9]*$/i)
+      ? setUsernameError(UsernameError.ContainsSpecialChars)
+      : setUsernameError(UsernameError.None);
     setUsername(event.target.value);
   };
 
+  const usernameHelperText = () => {
+    switch (usernameError) {
+      case UsernameError.Empty:
+        return "Username can not be empty.";
+      case UsernameError.FirstCharDigit:
+        return "First character of username must be a letter.";
+      case UsernameError.ContainsSpecialChars:
+        return "Username must contain only letters and digits.";
+      case UsernameError.None:
+        return "";
+    }
+  };
+
+  const passwordHelperText = () => {
+    switch (passwordError) {
+      case PasswordError.TooShort:
+        return "Password must be at least 5 characters.";
+      case PasswordError.DoNotMatch:
+        return "Passwords do not match.";
+      case PasswordError.None:
+        return "";
+    }
+  };
+
   const handlePasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    event.target.value.length < passwordMinLength
+      ? setPasswordError(PasswordError.TooShort)
+      : event.target.value !== confirmPassword
+      ? setPasswordError(PasswordError.DoNotMatch)
+      : setPasswordError(PasswordError.None);
     setPassword(event.target.value);
-    setlengthPasswordError(event.target.value.length < passwordMinLength);
-    setConfirmPasswordError(event.target.value !== confirmPassword);
   };
 
   const handleConfirmPasswordChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
+    event.target.value !== password
+      ? setPasswordError(PasswordError.DoNotMatch)
+      : setPasswordError(PasswordError.None);
     setConfirmPassword(event.target.value);
-    setConfirmPasswordError(event.target.value !== password);
   };
 
   const handleClickRegister = () => {
-    // setUsernameEmptyError(username === "");
-    // setPasswordEmptyError(password === "");
-    // if (!password || !username) return;
     setRegisterTrigger(true);
   };
 
@@ -64,10 +108,8 @@ const AddAdminForm: React.FC<FormDialogProps> = (props) => {
     setUsername("");
     setPassword("");
     setConfirmPassword("");
-    setConfirmPasswordError(false);
-    setlengthPasswordError(false);
-    setfirstCharLetterError(false);
-    setSpecialCharactersError(false);
+    setUsernameError(UsernameError.None);
+    setPasswordError(PasswordError.None);
     props.onClose();
   };
 
@@ -99,35 +141,42 @@ const AddAdminForm: React.FC<FormDialogProps> = (props) => {
           onSubmit={handleClickRegister}
         >
           <TextField
-            error={firstCharLetterError || specialCharactersError}
+            error={usernameError !== UsernameError.None}
             sx={{ marginTop: 5 }}
             label="Username"
             variant="outlined"
             value={username}
             onChange={handleUsernameChange}
             autoComplete="username"
-            helperText={firstCharLetterError ? "First character of username must be a letter." : 
-                        (specialCharactersError ? "Username must contain only letters and digits." : "")}
+            helperText={usernameHelperText()}
           />
           <TextField
-            error={confirmPasswordError || lengthPasswordError}
+            error={passwordError !== PasswordError.None}
             label="Password"
             variant="outlined"
             type="password"
             value={password}
             onChange={handlePasswordChange}
             autoComplete="new-password"
-            helperText={lengthPasswordError ? "Password must be at least 5 characters." : ""}
+            helperText={
+              passwordError === PasswordError.TooShort
+                ? "Password must be at least 5 characters."
+                : ""
+            }
           />
           <TextField
-            error={confirmPasswordError}
+            error={passwordError !== PasswordError.None}
             label="Confirm Password"
             variant="outlined"
             type="password"
             value={confirmPassword}
             onChange={handleConfirmPasswordChange}
             autoComplete="new-password"
-            helperText={confirmPasswordError ? "Passwords don't match." : ""}
+            helperText={
+              passwordError === PasswordError.DoNotMatch
+                ? "Passwords don't match."
+                : ""
+            }
           />
         </Box>
       </DialogContent>
@@ -139,7 +188,10 @@ const AddAdminForm: React.FC<FormDialogProps> = (props) => {
           onClick={handleClickRegister}
           loading={status === "loading"}
           variant="contained"
-          disabled={!username || !password || confirmPasswordError || firstCharLetterError || specialCharactersError || lengthPasswordError}
+          disabled={
+            passwordError !== PasswordError.None ||
+            usernameError !== UsernameError.None
+          }
         >
           Submit
         </LoadingButton>
