@@ -1,5 +1,4 @@
 import {
-  Alert,
   Box,
   Button,
   Dialog,
@@ -7,23 +6,12 @@ import {
   DialogContent,
   DialogTitle,
   Divider,
-  IconButton,
   MenuItem,
-  Snackbar,
   TextField,
-  Tooltip,
-  Zoom,
 } from "@mui/material";
-import AddCircleIcon from "@mui/icons-material/AddCircle";
-import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
-import FilterAltIcon from "@mui/icons-material/FilterAlt";
-import Slide, { SlideProps } from "@mui/material/Slide";
 import React from "react";
 import { FormDialogProps } from "./AppMenu";
 import { LoadingButton } from "@mui/lab";
-import { getAllPolls } from "../api";
-import { useQuery } from "react-query";
-import { UserContext } from "../App";
 import FiltersList from "./FiltersList";
 import { Filter } from "./FilterItem";
 
@@ -38,11 +26,8 @@ enum AnswerError {
 }
 
 const AddPollForm: React.FC<FormDialogProps> = (props) => {
-  const [filters, setFilters] = React.useState<Filter[]>([
-    { pollUid: "123", answerIndex: 123 } as Filter,
-    { pollUid: "123", answerIndex: 123 } as Filter,
-    { pollUid: "123", answerIndex: 123 } as Filter,
-  ]); //TODO implement filters
+  const [filters, setFilters] = React.useState<Filter[]>([]);
+  const [filtersError, setFiltersError] = React.useState(false);
   const [question, setQuestion] = React.useState("");
   const [questionError, setQuestionError] = React.useState(false);
   const [answers, setAnswers] = React.useState(["", ""]);
@@ -80,7 +65,7 @@ const AddPollForm: React.FC<FormDialogProps> = (props) => {
   const handleAnswerAmountChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    let answerNum: number = parseInt(event.target.value);
+    let answerNum: number = +event.target.value;
     let newAnswers = answers.slice();
     if (answerNum > answers.length) {
       for (let i = answers.length; i < answerNum; i++) {
@@ -91,6 +76,17 @@ const AddPollForm: React.FC<FormDialogProps> = (props) => {
     }
     setAnswers(newAnswers);
   };
+
+  React.useEffect(() => {
+    let error = false;
+    filters.forEach((filter) => {
+      if (Object.keys(filter).length === 0) {
+        error = true;
+        return;
+      }
+    });
+    setFiltersError(error);
+  }, [filters, filtersError]);
 
   return (
     <Dialog open={props.open} onClose={props.onClose} fullWidth>
@@ -105,9 +101,7 @@ const AddPollForm: React.FC<FormDialogProps> = (props) => {
             marginTop: 2,
           }}
           id="poll-form"
-          onSubmit={() => {
-            console.log("submit");
-          }}
+          onSubmit={() => {}}
         >
           <TextField
             sx={{ width: "80%" }}
@@ -123,7 +117,7 @@ const AddPollForm: React.FC<FormDialogProps> = (props) => {
             sx={{ width: "30%" }}
             select
             label="Number of poll answers"
-            value={answers.length}
+            defaultValue={2}
             onChange={handleAnswerAmountChange}
             variant="outlined"
           >
@@ -167,6 +161,7 @@ const AddPollForm: React.FC<FormDialogProps> = (props) => {
         <LoadingButton
           type="submit"
           form={props.formId}
+          disabled={filtersError || questionError}
           size="medium"
           onClick={() => {}} //TODO
           loading={false} //TODO

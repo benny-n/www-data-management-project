@@ -28,7 +28,7 @@ const FilterItem: React.FC<FilterItemProps> = (props) => {
   };
 
   const handleAnswerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let activeIndex = parseInt(e.target.value);
+    let activeIndex = +e.target.value;
     setActiveAnswer(activeIndex);
     props.setFilter(activeIndex);
   };

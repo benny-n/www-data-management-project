@@ -1,9 +1,11 @@
-import { TextField, MenuItem, Skeleton, Box, Typography } from "@mui/material";
+import { Skeleton, Box, Typography, IconButton } from "@mui/material";
 import React from "react";
 import { useQuery } from "react-query";
 import { getAllPolls } from "../api";
 import { UserContext } from "../App";
 import FilterItem, { Filter, Poll } from "./FilterItem";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
+import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
 
 export interface FiltersListProps {
   filters: Filter[];
@@ -34,47 +36,76 @@ const FiltersList: React.FC<FiltersListProps> = ({ filters, setFilters }) => {
         let newAnswersLists = answersLists.slice();
         newAnswersLists[index] = value.answers;
         setAnswersLists(newAnswersLists);
+        return true;
       }
+      return false;
     });
   };
 
   const handleAnswerChange = (answerIndex: number, index: number) => {
-    console.log("answer index", answerIndex);
     let newAnswerIndices = answersIndices.slice();
     newAnswerIndices[index] = answerIndex;
     setAnswersIndices(newAnswerIndices);
-    //setFilters()
+    let newFilters = filters.slice();
+    newFilters[index] = { answerIndex, pollUid: pollUids[index] };
+    setFilters(newFilters);
   };
 
-  //   React.useEffect(() => {
-  //     console.log("status", status);
-  //     try {
-  //       console.log("data", data?.polls);
-  //     } catch {
-  //       console.log("not yet");
-  //     }
-  //   }, [status, data]);
+  const handleAddFilter = (event: any) => {
+    let newFilters = filters.slice();
+    newFilters.push({} as Filter);
+    setFilters(newFilters);
+  };
+
+  const handleRemoveFilter = (event: any) => {
+    let newFilters = filters.slice();
+    newFilters.pop();
+    setFilters(newFilters);
+    let newPollUids = pollUids.slice();
+    newPollUids.pop();
+    setPollUids(newPollUids);
+    let newAnswersLists = answersLists.slice();
+    newAnswersLists.pop();
+    setAnswersLists(newAnswersLists);
+  };
 
   return status === "success" ? (
     <Box>
-      <FilterItem
-        polls={data!.polls}
-        activeAnswers={answersLists[0]}
-        onQuestionChange={(uid) => handleQuestionChange(uid, 0)}
-        setFilter={(answerIndex) => handleAnswerChange(answerIndex, 0)}
-      />
-      {/* {filters.map((element: Filter, index: number) => {
-        <FilterItem
-          polls={data!.polls}
-          activeAnswers={answersLists[index]}
-          onQuestionChange={(uid) => handleQuestionChange(uid, index)}
-          setFilter={(answerIndex) => handleAnswerChange(answerIndex, index)}
-        />;
-      })} */}
-
-      <Typography variant="caption" color="secondary" fontSize="11px">
-        The poll will be sent only to students who answered the selected answer
-        on the selected question.
+      <Box sx={{ display: "flex", flexDirection: "row" }}>
+        <Typography
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            marginRight: 1,
+          }}
+          color="text.secondary"
+          fontSize="14px"
+        >
+          Add or remove filters:
+        </Typography>
+        <IconButton onClick={handleAddFilter}>
+          <AddCircleIcon />
+        </IconButton>
+        <IconButton onClick={handleRemoveFilter}>
+          <RemoveCircleIcon />
+        </IconButton>
+      </Box>
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
+        {filters.map((_: Filter, index: number) => (
+          <FilterItem
+            key={index}
+            polls={data!.polls}
+            activeAnswers={answersLists[index]}
+            onQuestionChange={(uid) => handleQuestionChange(uid, index)}
+            setFilter={(answerIndex) => handleAnswerChange(answerIndex, index)}
+          />
+        ))}
+      </Box>
+      <Typography variant="caption" color="text.secondary" fontSize="11px">
+        {filters.length > 0
+          ? "The poll will be sent only to students who answered the selected answer on the selected question."
+          : ""}
       </Typography>
     </Box>
   ) : (
