@@ -14,34 +14,56 @@ import { FormDialogProps } from "./AppMenu";
 import { LoadingButton } from "@mui/lab";
 import FiltersList from "./FiltersList";
 import { Filter } from "../types";
+import { useQuery } from "react-query";
+import { createPoll } from "../api";
+import { UserContext } from "../App";
 
 const questionMaxLength = 300;
 const answerMaxLength = 100;
 const questionLengthErrorMessage = `Question length must be shorter than ${questionMaxLength} characters!`;
 const answerLengthErrorMessage = `Answer length must be shorter than ${answerMaxLength} characters!`;
+const emptyFieldErrorMessage = "Required field.";
 
-enum AnswerError {
+enum FieldError {
   None,
   TooLong,
+  Empty,
 }
 
 const AddPollForm: React.FC<FormDialogProps> = (props) => {
   const [filters, setFilters] = React.useState<Filter[]>([]);
   const [filtersError, setFiltersError] = React.useState(false);
   const [question, setQuestion] = React.useState("");
-  const [questionError, setQuestionError] = React.useState(false);
+  const [questionError, setQuestionError] = React.useState<FieldError>(
+    FieldError.None
+  );
   const [answers, setAnswers] = React.useState(["", ""]);
-  const [answerErrors, setAnswerErrors] = React.useState([
-    AnswerError.None,
-    AnswerError.None,
+  const [answerErrors, setAnswerErrors] = React.useState<FieldError[]>([
+    FieldError.None,
+    FieldError.None,
   ]);
+
+  const [createTrigger, setCreateTrigger] = React.useState(false);
+  const { basicAuth } = React.useContext(UserContext);
+  const { status, remove } = useQuery(
+    "create-poll",
+    () => createPoll(question, answers, filters, basicAuth!!),
+    {
+      enabled: createTrigger,
+      retry: false,
+      staleTime: Infinity,
+    }
+  );
 
   const handleQuestionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.value.length > questionMaxLength) {
-      setQuestionError(true);
+      setQuestionError(FieldError.TooLong);
       return;
+    } else if (event.target.value.length === 0) {
+      setQuestionError(FieldError.Empty);
+    } else {
+      setQuestionError(FieldError.None);
     }
-    setQuestionError(false);
     setQuestion(event.target.value);
   };
 
@@ -51,12 +73,16 @@ const AddPollForm: React.FC<FormDialogProps> = (props) => {
   ) => {
     let answerErrorsSlice = answerErrors.slice();
     if (event.target.value.length > answerMaxLength) {
-      answerErrorsSlice[index] = AnswerError.TooLong;
+      answerErrorsSlice[index] = FieldError.TooLong;
       setAnswerErrors(answerErrorsSlice);
       return;
+    } else if (event.target.value.length === 0) {
+      answerErrorsSlice[index] = FieldError.Empty;
+      setAnswerErrors(answerErrorsSlice);
+    } else {
+      answerErrorsSlice[index] = FieldError.None;
+      setAnswerErrors(answerErrorsSlice);
     }
-    answerErrorsSlice[index] = AnswerError.None;
-    setAnswerErrors(answerErrorsSlice);
     let answersSlice = answers.slice();
     answersSlice[index] = event.target.value;
     setAnswers(answersSlice);
@@ -77,6 +103,34 @@ const AddPollForm: React.FC<FormDialogProps> = (props) => {
     setAnswers(newAnswers);
   };
 
+  const handleClickCreate = () => {
+    if (!question) {
+      setQuestionError(FieldError.Empty);
+    } else if (answers.some((element) => element === "")) {
+      let newAnswerErrors = answerErrors.slice();
+      answers.forEach((answer: string, index: number) => {
+        if (!answer) {
+          newAnswerErrors[index] = FieldError.Empty;
+        }
+      });
+      setAnswerErrors(newAnswerErrors);
+    } else {
+      setCreateTrigger(true);
+    }
+  };
+
+  const handleClose = React.useCallback(() => {
+    setFilters([]);
+    setFiltersError(false);
+    setQuestion("");
+    setQuestionError(FieldError.None);
+    setAnswers(["", ""]);
+    setAnswerErrors([FieldError.None, FieldError.None]);
+    setCreateTrigger(false);
+    remove();
+    props.onClose();
+  }, [props, remove]);
+
   React.useEffect(() => {
     let error = false;
     filters.forEach((filter) => {
@@ -87,6 +141,12 @@ const AddPollForm: React.FC<FormDialogProps> = (props) => {
     });
     setFiltersError(error);
   }, [filters, filtersError]);
+
+  React.useEffect(() => {
+    if (status === "success") {
+      handleClose();
+    }
+  }, [status, handleClose]);
 
   return (
     <Dialog open={props.open} onClose={props.onClose} fullWidth>
@@ -105,11 +165,17 @@ const AddPollForm: React.FC<FormDialogProps> = (props) => {
         >
           <TextField
             sx={{ width: "80%" }}
-            error={questionError}
+            error={questionError !== FieldError.None}
             label="Poll Question"
             variant="outlined"
             value={question}
-            helperText={questionError ? questionLengthErrorMessage : ""}
+            helperText={
+              questionError === FieldError.TooLong
+                ? questionLengthErrorMessage
+                : questionError === FieldError.Empty
+                ? emptyFieldErrorMessage
+                : ""
+            }
             onChange={handleQuestionChange}
           />
           <Divider />
@@ -140,13 +206,15 @@ const AddPollForm: React.FC<FormDialogProps> = (props) => {
               <TextField
                 key={index}
                 sx={{ margin: 0.1, width: "49%" }}
-                error={answerErrors[index] === AnswerError.TooLong}
+                error={answerErrors[index] !== FieldError.None}
                 label={`Poll Answer ${index + 1}`}
                 variant="outlined"
                 value={answers[index]}
                 helperText={
-                  answerErrors[index] === AnswerError.TooLong
+                  answerErrors[index] === FieldError.TooLong
                     ? answerLengthErrorMessage
+                    : answerErrors[index] === FieldError.Empty
+                    ? emptyFieldErrorMessage
                     : ""
                 }
                 onChange={(e) => handleAnswerChange(e, index)}
@@ -161,15 +229,19 @@ const AddPollForm: React.FC<FormDialogProps> = (props) => {
         <LoadingButton
           type="submit"
           form={props.formId}
-          disabled={filtersError || questionError}
+          disabled={
+            filtersError ||
+            questionError !== FieldError.None ||
+            answerErrors.some((element) => element !== FieldError.None)
+          }
           size="medium"
-          onClick={() => {}} //TODO
-          loading={false} //TODO
+          onClick={handleClickCreate}
+          loading={status === "loading"}
           variant="contained"
         >
           Submit
         </LoadingButton>
-        <Button size="medium" variant="contained" onClick={props.onClose}>
+        <Button size="medium" variant="contained" onClick={handleClose}>
           Cancel
         </Button>
       </DialogActions>

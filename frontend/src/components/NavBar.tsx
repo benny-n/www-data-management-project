@@ -1,3 +1,4 @@
+import MenuIcon from "@mui/icons-material/Menu";
 import {
   AppBar,
   Box,
@@ -7,19 +8,15 @@ import {
   Typography,
   Zoom,
 } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
-import MenuIcon from "@mui/icons-material/Menu";
-import ThemeButton from "./ThemeButton";
 import React from "react";
-import AppMenu, { AppMenuProps } from "./AppMenu";
 import { UserContext } from "../App";
+import AppMenu, { AppMenuProps } from "./AppMenu";
+import ThemeButton from "./ThemeButton";
 
-const drawerWidth = 240;
-
-const NavBar: React.FC<{ loggedIn: boolean }> = ({ loggedIn }) => {
-  const theme = useTheme();
-  const [menuOpen, setMenuOpen] = React.useState(false);
-
+const NavBar: React.FC<{
+  menuOpen: boolean;
+  setMenuOpen: (_: boolean) => void;
+}> = ({ menuOpen, setMenuOpen }) => {
   const appMenuProps: AppMenuProps = {
     open: menuOpen,
     onClose: () => setMenuOpen(false),
@@ -28,26 +25,20 @@ const NavBar: React.FC<{ loggedIn: boolean }> = ({ loggedIn }) => {
   const { username } = React.useContext(UserContext);
 
   return (
-    <Box
-      sx={{ flexGrow: 1, display: "flex" }}
-      {...(menuOpen && {
-        width: `calc(100% - ${drawerWidth}px)`,
-        marginLeft: `${drawerWidth}px`,
-        transition: theme.transitions.create(["margin", "width"], {
-          easing: theme.transitions.easing.easeOut,
-          duration: theme.transitions.duration.enteringScreen,
-        }),
-      })}
-    >
+    <Box sx={{ width: "100%" }}>
       <AppBar position="static" color="primary" enableColorOnDark>
         <Toolbar>
           <Tooltip
-            title={!loggedIn && "You have to be logged in to use the menu"}
+            title={
+              username
+                ? "Main menu "
+                : "You have to be logged in to use the menu"
+            }
             TransitionComponent={Zoom}
           >
             <span>
               <IconButton
-                disabled={!loggedIn}
+                disabled={!username}
                 color="inherit"
                 aria-label="open drawer"
                 onClick={() => setMenuOpen(true)}
@@ -61,8 +52,9 @@ const NavBar: React.FC<{ loggedIn: boolean }> = ({ loggedIn }) => {
           <Typography
             variant="h6"
             noWrap
+            fontWeight="bold"
             component="div"
-            color="text.primary"
+            color="#ffffff"
             sx={{ mr: 2, display: { xs: "none", md: "flex" } }}
           >
             Hi {username}, Welcome to Telegram Polls!

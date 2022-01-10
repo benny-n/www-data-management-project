@@ -120,12 +120,14 @@ def add_user_response(poll_uid, chat_id, index):
 
 def get_chat_ids(filters):
     filtered_chat_ids = set(get_all_chat_ids())
-    for poll_uid, answer in filters:
+    for poll_filter in filters:
+        poll_uid = poll_filter["pollUid"]
+        answer_index = poll_filter["answerIndex"]
         filtered_chat_ids &= set(
             [user_response.chat_id for user_response in
              UserResponse.query.filter_by(
                  poll_uid=poll_uid,
-                 answer=answer)
+                 index=answer_index)
              ]
         )
     return filtered_chat_ids
@@ -173,11 +175,11 @@ def delete_poll_receiver(telegram_id):
         raise
 
 
-def get_poll_props(poll_uid):
-    poll_props = Poll.query.filter_by(poll_uid=poll_uid).first()
-    if poll_props is None:
+def get_poll(poll_uid):
+    poll = Poll.query.filter_by(uid=poll_uid).first()
+    if poll is None:
         raise DbErrorNotExist
-    return poll_props
+    return poll
 
 
 def get_answers(poll_uid):

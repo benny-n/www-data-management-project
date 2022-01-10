@@ -3,7 +3,6 @@ export interface Poll {
   question: string;
   answers: string[];
 }
-
 export interface PollStats extends Poll {
   votes: number[];
 }

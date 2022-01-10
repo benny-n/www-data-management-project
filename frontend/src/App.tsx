@@ -1,12 +1,14 @@
-import { Box, CssBaseline, ThemeProvider } from "@mui/material";
+import { Box, CssBaseline, ThemeProvider, useTheme } from "@mui/material";
 import React from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import "./App.css";
 import LoginForm from "./components/LoginForm";
 import NavBar from "./components/NavBar";
-import PollChart from "./components/PollChart";
+import PollsPage from "./components/PollsPage";
 import "./theme";
 import { getAppTheme } from "./theme";
+
+const drawerWidth = 240;
 
 interface UserState {
   username: string | null;
@@ -22,7 +24,9 @@ export const UserContext = React.createContext<
 });
 
 function App() {
+  const theme = useTheme();
   const authString = localStorage.getItem("basicAuth");
+  const [menuOpen, setMenuOpen] = React.useState(false);
   const [userState, setUserState] = React.useState<UserState>({
     username: authString && window.atob(authString).split(":")[0],
     basicAuth: authString,
@@ -44,18 +48,20 @@ function App() {
 
   return (
     <UserContext.Provider value={userContextValue}>
-      <NavBar loggedIn={!!userState.basicAuth} />
       <Box
-        sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}
+        sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}
+        {...(menuOpen && {
+          width: `calc(100% - ${drawerWidth}px)`,
+          marginLeft: `${drawerWidth}px`,
+          transition: theme.transitions.create(["margin", "width"], {
+            easing: theme.transitions.easing.easeOut,
+            duration: theme.transitions.duration.enteringScreen,
+          }),
+        })}
       >
-        {!userState.basicAuth && <LoginForm />}
+        <NavBar {...{ menuOpen, setMenuOpen }} />
+        {userState.basicAuth ? <PollsPage /> : <LoginForm />}
       </Box>
-      <PollChart
-        votes={[7, 15, 23]}
-        uid={"23"}
-        question={"are you me"}
-        answers={["yes", "no", "maybe"]}
-      />
     </UserContext.Provider>
   );
 }

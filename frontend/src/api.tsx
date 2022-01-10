@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Poll } from "./types";
+import { Filter, Poll, PollStats } from "./types";
 
 const API_URL = process.env.REACT_APP_API_URL;
 
@@ -36,12 +36,44 @@ export const register = async (
   );
 };
 
-//TODO maybe give type to return value instead of 'any'
+export const createPoll = async (
+  question: string,
+  answers: string[],
+  filters: Filter[],
+  authToken: string
+): Promise<any> => {
+  await axios.post(
+    `${API_URL}/polls`,
+    {
+      question,
+      answers,
+      filters,
+    },
+    {
+      headers: {
+        Authorization: `Basic ${authToken}`,
+      },
+    }
+  );
+};
+
 export const getAllPolls = async (
   authToken: string
 ): Promise<{ polls: Poll[] }> => {
   return (
     await axios.get(`${API_URL}/polls`, {
+      headers: {
+        Authorization: `Basic ${authToken}`,
+      },
+    })
+  ).data;
+};
+
+export const getAllPollStats = async (
+  authToken: string
+): Promise<{ stats: PollStats[] }> => {
+  return (
+    await axios.get(`${API_URL}/polls/stats`, {
       headers: {
         Authorization: `Basic ${authToken}`,
       },

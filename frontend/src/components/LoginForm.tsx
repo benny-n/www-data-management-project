@@ -45,7 +45,9 @@ const LoginForm: React.FC = () => {
   }, [status, username, password, setUserContext]);
 
   return (
-    <div>
+    <Box
+      sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}
+    >
       <Box
         component="form"
         sx={{
@@ -129,7 +131,7 @@ const LoginForm: React.FC = () => {
           Login
         </LoadingButton>
       </Box>
-    </div>
+    </Box>
   );
 };
 

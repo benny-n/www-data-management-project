@@ -107,7 +107,7 @@ def send_new_poll():
 def send_existing_poll(poll_uid):
     try:
         filters = request.json["filters"]
-        props = db.get_poll_props(poll_uid)
+        props = db.get_poll(poll_uid)
         answers = db.get_answers(poll_uid)
 
         send_poll(props.poll_uid, props.question, answers, filters)
@@ -121,13 +121,23 @@ def send_existing_poll(poll_uid):
         raise InternalServerError
 
 
-@app.route('/polls/<poll_uid>/stats', methods=['GET'])
+@app.route('/polls/stats', methods=['GET'])
 @auth.login_required
 @cross_origin()
-def get_poll_statistics(poll_uid):
+def get_poll_statistics():
     try:
-        vote_count = {answer: votes for _, answer, votes, in db.get_poll_stats(poll_uid)}
-        return jsonify(vote_count)
+        poll_stats = {"stats": []}
+        for poll in db.get_all_polls()["polls"]:
+            uid = poll["uid"]
+            question = db.get_poll(uid).question
+            query = db.get_poll_stats(uid)
+            poll_stats["stats"].append({
+                "uid": uid,
+                "question": question,
+                "answers": [answer for _, answer, _, in query],
+                "votes": [votes for _, _, votes, in query],
+            })
+        return jsonify(poll_stats)
     except Exception as e:
         print(e)
         raise InternalServerError
@@ -142,16 +152,6 @@ def get_all_polls():
     except Exception as e:
         print(e)
         raise InternalServerError
-
-#
-# @app.route('/test', methods=['GET'])
-# def test():
-#     try:
-#         a = db.get_all_polls()
-#         return jsonify(a)
-#     except Exception as e:
-#         print(e)
-#         raise InternalServerError
 
 
 @app.route('/user/responses', methods=['POST'])

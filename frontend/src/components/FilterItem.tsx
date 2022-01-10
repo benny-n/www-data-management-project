@@ -55,12 +55,15 @@ const FilterItem: React.FC<FilterItemProps> = (props) => {
         onChange={handleAnswerChange}
         variant="standard"
       >
-        {props.activeAnswers &&
+        {props.activeAnswers ? (
           props.activeAnswers.map((element: string, index: number) => (
             <MenuItem key={index} value={index}>
               {element}
             </MenuItem>
-          ))}
+          ))
+        ) : (
+          <MenuItem />
+        )}
       </TextField>
     </Box>
   );

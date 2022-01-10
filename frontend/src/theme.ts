@@ -1,5 +1,5 @@
 import { createTheme, PaletteMode, responsiveFontSizes } from "@mui/material";
-import { green, grey, lightGreen } from "@mui/material/colors";
+import { blue, grey, lightBlue } from "@mui/material/colors";
 
 export const getAppTheme = (mode: PaletteMode) => {
   let theme = createTheme({
@@ -8,9 +8,13 @@ export const getAppTheme = (mode: PaletteMode) => {
       ...(mode === "light"
         ? {
             // palette values for light mode
-            primary: lightGreen,
+            primary: {
+              main: lightBlue[700],
+              light: lightBlue[500],
+              dark: lightBlue[900],
+            },
             secondary: grey,
-            divider: lightGreen[500],
+            divider: lightBlue[500],
             text: {
               primary: grey[900],
               secondary: grey[600],
@@ -23,12 +27,12 @@ export const getAppTheme = (mode: PaletteMode) => {
         : {
             // palette values for dark mode
             primary: {
-              main: green[700],
-              light: green[500],
-              dark: green[900],
+              main: blue[700],
+              light: blue[500],
+              dark: blue[900],
             },
             secondary: grey,
-            divider: green[900],
+            divider: blue[900],
             text: {
               primary: "#fff",
               secondary: grey[500],
