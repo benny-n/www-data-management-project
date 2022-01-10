@@ -19,7 +19,7 @@ const FiltersList: React.FC<FiltersListProps> = ({ filters, setFilters }) => {
   const { basicAuth } = React.useContext(UserContext);
   const { data, status } = useQuery(
     "get-all-polls",
-    () => getAllPolls(basicAuth),
+    () => getAllPolls(basicAuth!!),
     {
       retry: false,
       refetchOnMount: "always",
@@ -102,11 +102,12 @@ const FiltersList: React.FC<FiltersListProps> = ({ filters, setFilters }) => {
           />
         ))}
       </Box>
-      <Typography variant="caption" color="text.secondary" fontSize="11px">
-        {filters.length > 0
-          ? "The poll will be sent only to students who answered the selected answer on the selected question."
-          : ""}
-      </Typography>
+      {filters.length > 0 && (
+        <Typography variant="caption" color="text.secondary" fontSize="11px">
+          The poll will be sent only to students who answered the selected
+          answer on the selected question."
+        </Typography>
+      )}
     </Box>
   ) : (
     <Box

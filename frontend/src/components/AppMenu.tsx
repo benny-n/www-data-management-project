@@ -56,7 +56,7 @@ const AppMenu: React.FC<AppMenuProps> = ({ open, onClose }) => {
   const handleLogout = () => {
     localStorage.removeItem("basicAuth");
     logout();
-    setUserContext("");
+    setUserContext(null);
     window.location.reload();
   };
 

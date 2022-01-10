@@ -1,37 +1,39 @@
+import { Box, CssBaseline, ThemeProvider } from "@mui/material";
 import React from "react";
+import { QueryClient, QueryClientProvider } from "react-query";
 import "./App.css";
+import LoginForm from "./components/LoginForm";
+import NavBar from "./components/NavBar";
 import "./theme";
 import { getAppTheme } from "./theme";
-import { Box, CssBaseline, ThemeProvider } from "@mui/material";
-import NavBar from "./components/NavBar";
-import LoginForm from "./components/LoginForm";
-import { QueryClient, QueryClientProvider } from "react-query";
 
 interface UserState {
-  username: string;
-  basicAuth: string;
+  username: string | null;
+  basicAuth: string | null;
 }
 
-export const UserContext = React.createContext({
-  username: "",
-  basicAuth: "",
-  setUserContext: (_: string) => {},
+export const UserContext = React.createContext<
+  UserState & { setUserContext: (_: string | null) => void }
+>({
+  username: null,
+  basicAuth: null,
+  setUserContext: (_) => {},
 });
 
 function App() {
   const authString = localStorage.getItem("basicAuth");
   const [userState, setUserState] = React.useState<UserState>({
-    username: authString ? window.atob(authString).split(":")[0] : "",
-    basicAuth: authString ? authString : "",
+    username: authString && window.atob(authString).split(":")[0],
+    basicAuth: authString,
   });
 
   const userContextValue = React.useMemo(
     () => ({
       username: userState.username,
       basicAuth: userState.basicAuth,
-      setUserContext: (basicAuth: string) => {
+      setUserContext: (basicAuth: string | null) => {
         setUserState({
-          username: basicAuth ? window.atob(basicAuth).split(":")[0] : "",
+          username: basicAuth && window.atob(basicAuth).split(":")[0],
           basicAuth,
         });
       },
@@ -41,11 +43,11 @@ function App() {
 
   return (
     <UserContext.Provider value={userContextValue}>
-      <NavBar loggedIn={userState.basicAuth !== ""} />
+      <NavBar loggedIn={!!userState.basicAuth} />
       <Box
         sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}
       >
-        {userState.basicAuth !== "" ? <></> : <LoginForm />}
+        {!userState.basicAuth && <LoginForm />}
       </Box>
     </UserContext.Provider>
   );

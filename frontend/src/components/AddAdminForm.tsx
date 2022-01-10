@@ -40,7 +40,7 @@ const AddAdminForm: React.FC<FormDialogProps> = (props) => {
   const { basicAuth } = React.useContext(UserContext);
   const { status } = useQuery(
     "register",
-    () => register(username, password, basicAuth),
+    () => register(username, password, basicAuth!!),
     {
       enabled: registerTrigger,
       retry: false,
@@ -67,17 +67,6 @@ const AddAdminForm: React.FC<FormDialogProps> = (props) => {
       case UsernameError.ContainsSpecialChars:
         return "Username must contain only letters and digits.";
       case UsernameError.None:
-        return "";
-    }
-  };
-
-  const passwordHelperText = () => {
-    switch (passwordError) {
-      case PasswordError.TooShort:
-        return "Password must be at least 5 characters.";
-      case PasswordError.DoNotMatch:
-        return "Passwords do not match.";
-      case PasswordError.None:
         return "";
     }
   };

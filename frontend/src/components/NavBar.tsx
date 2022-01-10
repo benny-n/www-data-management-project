@@ -42,7 +42,7 @@ const NavBar: React.FC<{ loggedIn: boolean }> = ({ loggedIn }) => {
       <AppBar position="static" color="primary" enableColorOnDark>
         <Toolbar>
           <Tooltip
-            title={loggedIn ? "" : "You have to be logged in to use the menu"}
+            title={!loggedIn && "You have to be logged in to use the menu"}
             TransitionComponent={Zoom}
           >
             <span>
