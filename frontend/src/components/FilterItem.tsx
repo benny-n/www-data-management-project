@@ -1,16 +1,6 @@
 import { TextField, MenuItem, Box } from "@mui/material";
 import React from "react";
-
-export interface Poll {
-  uid: string;
-  question: string;
-  answers: string[];
-}
-
-export interface Filter {
-  pollUid: string;
-  answerIndex: number;
-}
+import { Poll } from "../types";
 
 interface FilterItemProps {
   polls: Poll[];

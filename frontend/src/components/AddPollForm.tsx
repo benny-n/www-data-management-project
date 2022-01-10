@@ -13,7 +13,7 @@ import React from "react";
 import { FormDialogProps } from "./AppMenu";
 import { LoadingButton } from "@mui/lab";
 import FiltersList from "./FiltersList";
-import { Filter } from "./FilterItem";
+import { Filter } from "../types";
 
 const questionMaxLength = 300;
 const answerMaxLength = 100;

@@ -3,7 +3,8 @@ import React from "react";
 import { useQuery } from "react-query";
 import { getAllPolls } from "../api";
 import { UserContext } from "../App";
-import FilterItem, { Filter, Poll } from "./FilterItem";
+import FilterItem from "./FilterItem";
+import { Filter, Poll } from "../types";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
 

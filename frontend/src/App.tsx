@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from "react-query";
 import "./App.css";
 import LoginForm from "./components/LoginForm";
 import NavBar from "./components/NavBar";
+import PollChart from "./components/PollChart";
 import "./theme";
 import { getAppTheme } from "./theme";
 
@@ -49,6 +50,12 @@ function App() {
       >
         {!userState.basicAuth && <LoginForm />}
       </Box>
+      <PollChart
+        votes={[7, 15, 23]}
+        uid={"23"}
+        question={"are you me"}
+        answers={["yes", "no", "maybe"]}
+      />
     </UserContext.Provider>
   );
 }
