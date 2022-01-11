@@ -6,11 +6,23 @@ import { UserContext } from "../App";
 import { PollStats } from "../types";
 import PollChart from "./PollChart";
 
-const PollsPage: React.FC = () => {
+export interface PollsPageProps {
+  refresh: boolean;
+  setRefresh: (_: boolean) => void;
+}
+
+const PollsPage: React.FC<PollsPageProps> = ({ refresh, setRefresh }) => {
   const { basicAuth } = React.useContext(UserContext);
-  const { data, status } = useQuery("get-all-polls-stats", () =>
+  const { data, status, remove } = useQuery("get-all-polls-stats", () =>
     getAllPollStats(basicAuth!!)
   );
+
+  React.useEffect(() => {
+    if (refresh) {
+      remove();
+      setRefresh(false);
+    }
+  }, [refresh, setRefresh, remove]);
 
   return (
     <Box
@@ -25,12 +37,12 @@ const PollsPage: React.FC = () => {
       }}
     >
       {status === "success"
-        ? data!!.stats.map((poll_stats: PollStats, index) => (
+        ? data!!.stats.map((pollStats: PollStats, index) => (
             <Box sx={{ width: "49%" }} key={index}>
-              <PollChart {...poll_stats} />
+              <PollChart {...{ pollStats, setRefresh }} />
               <Divider
                 orientation="vertical"
-                sx={{ height: "320px", marginTop: "-320px" }}
+                sx={{ height: "340px", marginTop: "-340px" }}
               />
             </Box>
           ))

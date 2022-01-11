@@ -12,11 +12,18 @@ import React from "react";
 import { UserContext } from "../App";
 import AppMenu, { AppMenuProps } from "./AppMenu";
 import ThemeButton from "./ThemeButton";
-
-const NavBar: React.FC<{
+import RefreshIcon from "@mui/icons-material/Refresh";
+export interface NavBarProps {
   menuOpen: boolean;
   setMenuOpen: (_: boolean) => void;
-}> = ({ menuOpen, setMenuOpen }) => {
+  setRefresh: (_: boolean) => void;
+}
+
+const NavBar: React.FC<NavBarProps> = ({
+  menuOpen,
+  setMenuOpen,
+  setRefresh,
+}) => {
   const appMenuProps: AppMenuProps = {
     open: menuOpen,
     onClose: () => setMenuOpen(false),
@@ -63,6 +70,9 @@ const NavBar: React.FC<{
             sx={{ flexGrow: 1, display: "flex", flexDirection: "row-reverse" }}
           >
             <ThemeButton />
+            <IconButton onClick={() => setRefresh(true)}>
+              <RefreshIcon />
+            </IconButton>
           </Box>
         </Toolbar>
       </AppBar>

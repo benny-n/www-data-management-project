@@ -26,6 +26,7 @@ export const UserContext = React.createContext<
 function App() {
   const theme = useTheme();
   const authString = localStorage.getItem("basicAuth");
+  const [refresh, setRefresh] = React.useState(false);
   const [menuOpen, setMenuOpen] = React.useState(false);
   const [userState, setUserState] = React.useState<UserState>({
     username: authString && window.atob(authString).split(":")[0],
@@ -59,8 +60,12 @@ function App() {
           }),
         })}
       >
-        <NavBar {...{ menuOpen, setMenuOpen }} />
-        {userState.basicAuth ? <PollsPage /> : <LoginForm />}
+        <NavBar {...{ menuOpen, setMenuOpen, setRefresh }} />
+        {userState.basicAuth ? (
+          <PollsPage {...{ refresh, setRefresh }} />
+        ) : (
+          <LoginForm />
+        )}
       </Box>
     </UserContext.Provider>
   );

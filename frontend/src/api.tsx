@@ -69,6 +69,17 @@ export const createPoll = async (
   );
 };
 
+export const deletePoll = async (
+  pollUid: string,
+  authToken: string
+): Promise<any> => {
+  await axios.delete(`${API_URL}/polls/${pollUid}`, {
+    headers: {
+      Authorization: `Basic ${authToken}`,
+    },
+  });
+};
+
 export const getAllPolls = async (
   authToken: string
 ): Promise<{ polls: Poll[] }> => {

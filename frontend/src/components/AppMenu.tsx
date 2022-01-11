@@ -70,7 +70,6 @@ const AppMenu: React.FC<AppMenuProps> = ({ open, onClose }) => {
   };
 
   React.useEffect(() => {
-    console.log("re-render");
     remove();
   }, [addAdminDialogOpen, remove]);
 

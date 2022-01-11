@@ -92,13 +92,15 @@ def send_poll(uid, question, answers, filters=None):
 @app.route('/polls', methods=['POST'])
 @auth.login_required
 @cross_origin()
-def send_new_poll():
+def create_poll():
     try:
         question = request.json["question"]
         answers = request.json["answers"]
         filters = request.json["filters"]  # TODO if doesn't exist, exception, or None?
         uid = generate_uid()
 
+        if question in db.get_all_questions():
+            return Response(status=409)
         db.add_poll(poll_uid=uid, question=question)
 
         for index, answer in enumerate(answers):
@@ -108,27 +110,20 @@ def send_new_poll():
 
         return Response()
 
-    except IntegrityError:
-        return Response(status=409)
+    except Exception as e:
+        print(e)
+        raise InternalServerError
 
 
-@app.route('/polls/<poll_uid>', methods=['PUT'])
+@app.route('/polls/<uid>', methods=['DELETE'])
 @auth.login_required
 @cross_origin()
-def send_existing_poll(poll_uid):
+def delete_poll(uid):
     try:
-        filters = request.json["filters"]
-        props = db.get_poll(poll_uid)
-        answers = db.get_answers(poll_uid)
-
-        send_poll(props.poll_uid, props.question, answers, filters)
-
+        db.delete_poll(uid)
         return Response()
-
-    except IntegrityError:
-        return Response(status=409)
-
-    except DbErrorNotExist:
+    except Exception as e:
+        print(e)
         raise InternalServerError
 
 

@@ -64,7 +64,9 @@ const AddAdminForm: React.FC<FormDialogProps> = (props) => {
       case UsernameError.ContainsSpecialChars:
         return "Username must contain only letters and digits.";
       case UsernameError.None:
-        return "";
+        if (status === "error") {
+          return "Username already exists!";
+        }
     }
   };
 
@@ -133,7 +135,7 @@ const AddAdminForm: React.FC<FormDialogProps> = (props) => {
           onSubmit={handleClickRegister}
         >
           <TextField
-            error={usernameError !== UsernameError.None}
+            error={usernameError !== UsernameError.None || status === "error"}
             sx={{ marginTop: 5 }}
             label="Username"
             variant="outlined"

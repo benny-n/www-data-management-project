@@ -36,6 +36,13 @@ class PollAnswer(db.Model):
     uid = db.Column(db.String(POLL_UID_LENGTH), primary_key=True)
     index = db.Column(db.Integer, primary_key=True)
     answer = db.Column(db.String(ANSWER_LENGTH))
+    __table_args__ = (
+        ForeignKeyConstraint(
+            (uid,),
+            [Poll.uid],
+            ondelete="CASCADE"
+        ),
+    )
 
 
 class PollReceiver(db.Model):
@@ -164,6 +171,17 @@ def add_poll_receiver(telegram_id, uid):
     return PollReceiver(telegram_id=telegram_id, uid=uid)
 
 
+def delete_poll(uid):
+    try:
+        poll_to_delete: Poll = Poll.query.filter_by(uid=uid).first()
+        db.session.delete(poll_to_delete)
+        db.session.commit()
+
+    except Exception:
+        db.session.rollback()
+        raise
+
+
 def delete_poll_receiver(telegram_id):
     try:
         poll_to_delete: PollReceiver = PollReceiver.query.filter_by(telegram_id=telegram_id).first()
@@ -195,6 +213,10 @@ def get_poll_stats(poll_uid):
         .filter(UserResponse.poll_uid == poll_uid) \
         .group_by(UserResponse.poll_uid, PollAnswer.answer) \
         .all()
+
+
+def get_all_questions():
+    return [poll.question for poll in Poll.query.all()]
 
 
 def get_all_polls():

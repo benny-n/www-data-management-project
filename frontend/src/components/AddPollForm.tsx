@@ -21,6 +21,7 @@ import { UserContext } from "../App";
 const questionMaxLength = 300;
 const answerMaxLength = 100;
 const questionLengthErrorMessage = `Question length must be shorter than ${questionMaxLength} characters!`;
+const questionAlreadyExistsErrorMessage = "This question already exists!";
 const answerLengthErrorMessage = `Answer length must be shorter than ${answerMaxLength} characters!`;
 const emptyFieldErrorMessage = "Required field.";
 
@@ -165,7 +166,7 @@ const AddPollForm: React.FC<FormDialogProps> = (props) => {
         >
           <TextField
             sx={{ width: "80%" }}
-            error={questionError !== FieldError.None}
+            error={questionError !== FieldError.None || status === "error"}
             label="Poll Question"
             variant="outlined"
             value={question}
@@ -174,6 +175,8 @@ const AddPollForm: React.FC<FormDialogProps> = (props) => {
                 ? questionLengthErrorMessage
                 : questionError === FieldError.Empty
                 ? emptyFieldErrorMessage
+                : status === "error"
+                ? questionAlreadyExistsErrorMessage
                 : ""
             }
             onChange={handleQuestionChange}
@@ -206,7 +209,10 @@ const AddPollForm: React.FC<FormDialogProps> = (props) => {
               <TextField
                 key={index}
                 sx={{ margin: 0.1, width: "49%" }}
-                error={answerErrors[index] !== FieldError.None}
+                error={
+                  answerErrors[index] !== FieldError.None &&
+                  answerErrors[index] !== undefined
+                }
                 label={`Poll Answer ${index + 1}`}
                 variant="outlined"
                 value={answers[index]}
