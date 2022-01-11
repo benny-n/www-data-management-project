@@ -1,4 +1,4 @@
-import { Box, Divider } from "@mui/material";
+import { Box, Divider, Skeleton } from "@mui/material";
 import React from "react";
 import { useQuery } from "react-query";
 import { getAllPollStats } from "../api";
@@ -12,10 +12,6 @@ const PollsPage: React.FC = () => {
     getAllPollStats(basicAuth!!)
   );
 
-  React.useEffect(() => {
-    console.log(data);
-  }, [data]);
-
   return (
     <Box
       className="poll-page-box"
@@ -28,19 +24,32 @@ const PollsPage: React.FC = () => {
         marginTop: 1,
       }}
     >
-      {status === "success" ? (
-        data!!.stats.map((poll_stats: PollStats, index) => (
-          <Box sx={{ width: "49%" }}>
-            <PollChart key={index} {...poll_stats} />
-            <Divider
-              orientation="vertical"
-              sx={{ height: "320px", marginTop: "-320px" }}
-            />
-          </Box>
-        ))
-      ) : (
-        <span>Loading...</span>
-      )}
+      {status === "success"
+        ? data!!.stats.map((poll_stats: PollStats, index) => (
+            <Box sx={{ width: "49%" }} key={index}>
+              <PollChart {...poll_stats} />
+              <Divider
+                orientation="vertical"
+                sx={{ height: "320px", marginTop: "-320px" }}
+              />
+            </Box>
+          ))
+        : [0, 1, 2, 3].map((index) => (
+            <Box
+              key={index}
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                width: "49%",
+                alignItems: "center",
+                gap: 3,
+              }}
+            >
+              <Skeleton width={50} />
+              <Skeleton variant="circular" width={210} height={218} />
+              <Skeleton width="100%" />
+            </Box>
+          ))}
     </Box>
   );
 };

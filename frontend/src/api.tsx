@@ -36,6 +36,18 @@ export const register = async (
   );
 };
 
+export const getAllAdmins = async (
+  authToken: string
+): Promise<{ admins: string[] }> => {
+  return (
+    await axios.get(`${API_URL}/admins`, {
+      headers: {
+        Authorization: `Basic ${authToken}`,
+      },
+    })
+  ).data;
+};
+
 export const createPoll = async (
   question: string,
   answers: string[],

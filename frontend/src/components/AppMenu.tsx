@@ -1,22 +1,28 @@
+import { ExpandLess, ExpandMore } from "@mui/icons-material";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import GroupAddIcon from "@mui/icons-material/GroupAdd";
+import LogoutIcon from "@mui/icons-material/Logout";
+import PollIcon from "@mui/icons-material/Poll";
+import SupervisorAccountIcon from "@mui/icons-material/SupervisorAccount";
 import {
-  Drawer,
   Box,
-  Typography,
-  IconButton,
+  Collapse,
   Divider,
+  Drawer,
+  IconButton,
   List,
   ListItem,
+  ListItemButton,
   ListItemIcon,
   ListItemText,
+  Skeleton,
+  Typography,
 } from "@mui/material";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import SupervisorAccountIcon from "@mui/icons-material/SupervisorAccount";
-import PollIcon from "@mui/icons-material/Poll";
-import LogoutIcon from "@mui/icons-material/Logout";
 import React from "react";
-import AddAdminForm from "./AddAdminForm";
-import { logout } from "../api";
+import { useQuery } from "react-query";
+import { getAllAdmins, logout } from "../api";
 import { UserContext } from "../App";
+import AddAdminForm from "./AddAdminForm";
 import AddPollForm from "./AddPollForm";
 
 const drawerWidth = 240;
@@ -34,8 +40,13 @@ export interface AppMenuProps {
 }
 
 const AppMenu: React.FC<AppMenuProps> = ({ open, onClose }) => {
+  const [adminListOpen, setAdminListOpen] = React.useState(true);
   const [addAdminDialogOpen, setAddAdminDialogOpen] = React.useState(false);
   const [addPollDialogOpen, setAddPollDialogOpen] = React.useState(false);
+  const { basicAuth } = React.useContext(UserContext);
+  const { data, status, remove } = useQuery("get-all-admins", () =>
+    getAllAdmins(basicAuth!!)
+  );
 
   const { setUserContext } = React.useContext(UserContext);
 
@@ -52,6 +63,16 @@ const AppMenu: React.FC<AppMenuProps> = ({ open, onClose }) => {
     open: addPollDialogOpen,
     onClose: () => setAddPollDialogOpen(false),
   };
+
+  const handleClick = () => {
+    //TODO rename
+    setAdminListOpen(!adminListOpen);
+  };
+
+  React.useEffect(() => {
+    console.log("re-render");
+    remove();
+  }, [addAdminDialogOpen, remove]);
 
   const handleLogout = () => {
     localStorage.removeItem("basicAuth");
@@ -89,13 +110,43 @@ const AppMenu: React.FC<AppMenuProps> = ({ open, onClose }) => {
       </Box>
       <Divider />
       <List>
+        <ListItemButton onClick={handleClick}>
+          <ListItemIcon>
+            <SupervisorAccountIcon />
+          </ListItemIcon>
+          <ListItemText primary="Admins" />
+          {adminListOpen ? <ExpandLess /> : <ExpandMore />}
+        </ListItemButton>
+        <Collapse
+          sx={{
+            width: "80%",
+            marginLeft: 3,
+            gap: 0,
+          }}
+          in={adminListOpen}
+          timeout="auto"
+        >
+          <List component="div" disablePadding>
+            {status === "success"
+              ? data!!.admins.map((username, index) => (
+                  <ListItem
+                    key={index}
+                    sx={{ gap: 2, paddingTop: 0, paddingBottom: 0 }}
+                  >
+                    <Typography fontSize="25px">•</Typography>
+                    <Typography>{username}</Typography>
+                  </ListItem>
+                ))
+              : [0, 1].map((index) => <Skeleton key={index} />)}
+          </List>
+        </Collapse>
         <ListItem
           button
           key="Add new admin"
           onClick={() => setAddAdminDialogOpen(true)}
         >
           <ListItemIcon>
-            <SupervisorAccountIcon />
+            <GroupAddIcon />
           </ListItemIcon>
           <ListItemText primary="Add new admin" />
         </ListItem>

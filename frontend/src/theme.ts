@@ -32,7 +32,7 @@ export const getAppTheme = (mode: PaletteMode) => {
               dark: blue[900],
             },
             secondary: grey,
-            divider: blue[900],
+            divider: blue[200],
             text: {
               primary: "#fff",
               secondary: grey[500],

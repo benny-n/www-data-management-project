@@ -60,6 +60,17 @@ def register_admin():
         return Response(status=409)
 
 
+@app.route('/admins', methods=['GET'])
+@auth.login_required
+@cross_origin()
+def get_all_admins():
+    try:
+        return jsonify(db.get_all_admins())
+    except Exception as e:
+        print(e)
+        raise InternalServerError
+
+
 def send_poll(uid, question, answers, filters=None):
     chat_ids = db.get_all_chat_ids() if filters is None else db.get_chat_ids(filters)
 

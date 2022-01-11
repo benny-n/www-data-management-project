@@ -216,3 +216,8 @@ def get_all_polls():
         })
 
     return {"polls": polls_list}
+
+
+def get_all_admins():
+    admins = [admin.username for admin in Admin.query.all()]
+    return {"admins": admins}
