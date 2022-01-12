@@ -5,13 +5,17 @@ from flask_cors import cross_origin
 from sqlalchemy.exc import IntegrityError
 from werkzeug.exceptions import InternalServerError
 from uuid import uuid4 as generate_uid
-from backend import db
-from backend.config import CONFIG
+from backend import db, config
 from backend.auth import auth
 from backend.db import DbErrorDelete, DbErrorNotExist
 
+
+def uri():
+    return f'postgresql://{config.db_user}:{config.db_password}@{config.host}:{config.port}/{config.db_name}'
+
+
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = CONFIG.uri()
+app.config['SQLALCHEMY_DATABASE_URI'] = uri()
 db.init(app)
 
 
@@ -47,7 +51,7 @@ def login():
             {"username": username,
              "password": password
              },
-            CONFIG.secret,
+            config.secret,
             algorithm='HS256'
         ))
     except DbErrorNotExist:
@@ -83,7 +87,7 @@ def send_poll(uid, question, answers, filters=None):
 
     for chat_id in chat_ids:
         resp = requests.post(
-            url=f"https://api.telegram.org/bot{CONFIG.token}/sendPoll",
+            url=f"https://api.telegram.org/bot{config.bot_key}/sendPoll",
             json={
                 'chat_id': chat_id,
                 'question': question,

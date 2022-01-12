@@ -2,7 +2,8 @@
 
 import logging
 import requests
-from backend.config import CONFIG
+
+from backend import config
 from telegram import Update, ParseMode
 from telegram.ext import Updater, CommandHandler, PollAnswerHandler, CallbackContext
 
@@ -48,7 +49,7 @@ def receive_poll_answer(update: Update, context: CallbackContext) -> None:
 def bot() -> None:
 
     # Init updater with telegram bot token
-    updater = Updater(CONFIG.token)
+    updater = Updater(config.bot_key)
     dispatcher = updater.dispatcher
 
     # Add command handlers

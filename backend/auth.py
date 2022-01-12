@@ -1,8 +1,7 @@
 import jwt
 from flask_httpauth import HTTPTokenAuth
 from flask import g
-from backend import db
-from backend.config import CONFIG
+from backend import db, config
 from backend.db import DbErrorNotExist
 
 auth = HTTPTokenAuth('Bearer')
@@ -11,7 +10,7 @@ auth = HTTPTokenAuth('Bearer')
 @auth.verify_token
 def verify_token(token):
     try:
-        data = jwt.decode(token, CONFIG.secret, algorithms=['HS256'], options={"verify_exp": False})
+        data = jwt.decode(token, config.secret, algorithms=['HS256'], options={"verify_exp": False})
         username = data['username']
         password = data['password']
         admin = db.get_admin(username)
