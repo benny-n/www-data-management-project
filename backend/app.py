@@ -1,17 +1,18 @@
 import requests
 import jwt
+import db
+import config
 from flask import Flask, request, Response, jsonify
 from flask_cors import cross_origin
 from sqlalchemy.exc import IntegrityError
 from werkzeug.exceptions import InternalServerError
 from uuid import uuid4 as generate_uid
-from backend import db, config
-from backend.auth import auth
-from backend.db import DbErrorDelete, DbErrorNotExist
+from auth import auth
+from db import DbErrorDelete, DbErrorNotExist
 
 
 def uri():
-    return f'postgresql://{config.db_user}:{config.db_password}@{config.host}:{config.port}/{config.db_name}'
+    return f'postgresql://{config.db_user}:{config.db_password}@{config.host}:{config.db_port}/{config.db_name}'
 
 
 app = Flask(__name__)
@@ -189,4 +190,4 @@ def receive_user_response():
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(port=config.port)

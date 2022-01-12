@@ -1,8 +1,9 @@
 import jwt
+import db
+import config
 from flask_httpauth import HTTPTokenAuth
 from flask import g
-from backend import db, config
-from backend.db import DbErrorNotExist
+from db import DbErrorNotExist
 
 auth = HTTPTokenAuth('Bearer')
 

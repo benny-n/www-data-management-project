@@ -2,8 +2,7 @@
 
 import logging
 import requests
-
-from backend import config
+import config
 from telegram import Update, ParseMode
 from telegram.ext import Updater, CommandHandler, PollAnswerHandler, CallbackContext
 
