@@ -1,4 +1,5 @@
 import requests
+import jwt
 from flask import Flask, request, Response, jsonify
 from flask_cors import cross_origin
 from sqlalchemy.exc import IntegrityError
@@ -42,7 +43,13 @@ def login():
         admin = db.get_admin(username)
         if not admin.verify_password(password):
             return Response(status=401)
-        return Response()
+        return Response(jwt.encode(
+            {"username": username,
+             "password": password
+             },
+            CONFIG.secret,
+            algorithm='HS256'
+        ))
     except DbErrorNotExist:
         return Response(status=401)
 

@@ -45,10 +45,10 @@ const AddPollForm: React.FC<FormDialogProps> = (props) => {
   ]);
 
   const [createTrigger, setCreateTrigger] = React.useState(false);
-  const { basicAuth } = React.useContext(UserContext);
+  const { jwt } = React.useContext(UserContext);
   const { status, remove } = useQuery(
     "create-poll",
-    () => createPoll(question, answers, filters, basicAuth!!),
+    () => createPoll(question, answers, filters, jwt!!),
     {
       enabled: createTrigger,
       retry: false,

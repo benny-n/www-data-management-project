@@ -17,16 +17,12 @@ const FiltersList: React.FC<FiltersListProps> = ({ filters, setFilters }) => {
   const [pollUids, setPollUids] = React.useState<string[]>([]);
   const [answersIndices, setAnswersIndices] = React.useState<number[]>([]);
   const [answersLists, setAnswersLists] = React.useState<string[][]>([]);
-  const { basicAuth } = React.useContext(UserContext);
-  const { data, status } = useQuery(
-    "get-all-polls",
-    () => getAllPolls(basicAuth!!),
-    {
-      retry: false,
-      refetchOnMount: "always",
-      staleTime: Infinity,
-    }
-  );
+  const { jwt } = React.useContext(UserContext);
+  const { data, status } = useQuery("get-all-polls", () => getAllPolls(jwt!!), {
+    retry: false,
+    refetchOnMount: "always",
+    staleTime: Infinity,
+  });
 
   const handleQuestionChange = (uid: string, index: number) => {
     let newPollUids = pollUids.slice();

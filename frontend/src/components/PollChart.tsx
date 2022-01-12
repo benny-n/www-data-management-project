@@ -18,11 +18,11 @@ export interface PollChartProps {
 const PollChart: React.FC<PollChartProps> = ({ pollStats, setRefresh }) => {
   const theme = useTheme();
   const [deleteTrigger, setDeleteTrigger] = React.useState(false);
-  const { basicAuth } = React.useContext(UserContext);
+  const { jwt } = React.useContext(UserContext);
   const { status, remove } = useQuery(
     "delete-poll",
     () => {
-      deletePoll(pollStats.uid, basicAuth!!);
+      deletePoll(pollStats.uid, jwt!!);
     },
     { enabled: deleteTrigger, retry: false, staleTime: Infinity }
   );
