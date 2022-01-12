@@ -1,5 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import ForeignKeyConstraint, func
+from sqlalchemy.exc import IntegrityError
 from werkzeug.security import generate_password_hash, check_password_hash
 
 db = SQLAlchemy()
@@ -79,11 +80,19 @@ class Admin(db.Model):
         return check_password_hash(self.password_hash, password)
 
 
+def add_default_admin():
+    try:
+        add_admin(username="admin", password="236369")
+    except IntegrityError:  # if default admin already exists, do nothing
+        return
+
+
 def init(app):
     with app.app_context():
         db.init_app(app)
         db.create_all()
         db.session.commit()
+        add_default_admin()
 
 
 def add_db_model(create_db_model_func):
