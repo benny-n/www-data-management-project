@@ -20,7 +20,7 @@ import {
 } from "@mui/material";
 import React from "react";
 import { useQuery } from "react-query";
-import { getAllAdmins, logout } from "../api";
+import { getAllAdmins } from "../api";
 import { UserContext } from "../App";
 import AddAdminForm from "./AddAdminForm";
 import AddPollForm from "./AddPollForm";
@@ -43,9 +43,11 @@ const AppMenu: React.FC<AppMenuProps> = ({ open, onClose }) => {
   const [adminListOpen, setAdminListOpen] = React.useState(true);
   const [addAdminDialogOpen, setAddAdminDialogOpen] = React.useState(false);
   const [addPollDialogOpen, setAddPollDialogOpen] = React.useState(false);
-  const { basicAuth } = React.useContext(UserContext);
-  const { data, status, remove } = useQuery("get-all-admins", () =>
-    getAllAdmins(basicAuth!!)
+  const { jwt } = React.useContext(UserContext);
+  const { data, status, remove } = useQuery(
+    "get-all-admins",
+    () => getAllAdmins(jwt!!),
+    { enabled: !!jwt }
   );
 
   const { setUserContext } = React.useContext(UserContext);
@@ -74,8 +76,7 @@ const AppMenu: React.FC<AppMenuProps> = ({ open, onClose }) => {
   }, [addAdminDialogOpen, remove]);
 
   const handleLogout = () => {
-    localStorage.removeItem("basicAuth");
-    logout();
+    localStorage.removeItem("jwt");
     setUserContext(null);
     window.location.reload();
   };

@@ -5,6 +5,7 @@ import "./App.css";
 import LoginForm from "./components/LoginForm";
 import NavBar from "./components/NavBar";
 import PollsPage from "./components/PollsPage";
+import { useJwt } from "react-jwt";
 import "./theme";
 import { getAppTheme } from "./theme";
 
@@ -12,39 +13,54 @@ const drawerWidth = 240;
 
 interface UserState {
   username: string | null;
-  basicAuth: string | null;
+  jwt: string | null;
+}
+
+interface Credentials {
+  username: string;
+  password: string;
 }
 
 export const UserContext = React.createContext<
   UserState & { setUserContext: (_: string | null) => void }
 >({
   username: null,
-  basicAuth: null,
+  jwt: null,
   setUserContext: (_) => {},
 });
 
 function App() {
   const theme = useTheme();
-  const authString = localStorage.getItem("basicAuth");
+  const authString = localStorage.getItem("jwt");
+  const { decodedToken, isExpired } = useJwt(authString!!);
   const [refresh, setRefresh] = React.useState(false);
   const [menuOpen, setMenuOpen] = React.useState(false);
   const [userState, setUserState] = React.useState<UserState>({
-    username: authString && window.atob(authString).split(":")[0],
-    basicAuth: authString,
+    username: null,
+    jwt: authString,
   });
+
+  React.useEffect(() => {
+    if (!!decodedToken && !userState.username) {
+      setUserState({
+        ...userState,
+        username: (decodedToken as Credentials).username,
+      });
+    }
+  }, [decodedToken, isExpired, userState]);
 
   const userContextValue = React.useMemo(
     () => ({
       username: userState.username,
-      basicAuth: userState.basicAuth,
-      setUserContext: (basicAuth: string | null) => {
+      jwt: userState.jwt,
+      setUserContext: (jwt: string | null) => {
         setUserState({
-          username: basicAuth && window.atob(basicAuth).split(":")[0],
-          basicAuth,
+          username: decodedToken && (decodedToken as Credentials).username,
+          jwt,
         });
       },
     }),
-    [userState]
+    [decodedToken, userState]
   );
 
   return (
@@ -61,7 +77,7 @@ function App() {
         })}
       >
         <NavBar {...{ menuOpen, setMenuOpen, setRefresh }} />
-        {userState.basicAuth ? (
+        {userState.jwt ? (
           <PollsPage {...{ refresh, setRefresh }} />
         ) : (
           <LoginForm />

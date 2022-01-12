@@ -6,15 +6,13 @@ const API_URL = process.env.REACT_APP_API_URL;
 export const login = async (
   username: string,
   password: string
-): Promise<any> => {
-  await axios.post(`${API_URL}/login`, {
-    username,
-    password,
-  });
-};
-
-export const logout = async (): Promise<any> => {
-  await axios.get(`${API_URL}/logout`);
+): Promise<string> => {
+  return (
+    await axios.post(`${API_URL}/login`, {
+      username,
+      password,
+    })
+  ).data;
 };
 
 export const register = async (
@@ -30,7 +28,7 @@ export const register = async (
     },
     {
       headers: {
-        Authorization: `Basic ${authToken}`,
+        Authorization: `Bearer ${authToken}`,
       },
     }
   );
@@ -42,7 +40,7 @@ export const getAllAdmins = async (
   return (
     await axios.get(`${API_URL}/admins`, {
       headers: {
-        Authorization: `Basic ${authToken}`,
+        Authorization: `Bearer ${authToken}`,
       },
     })
   ).data;
@@ -63,7 +61,7 @@ export const createPoll = async (
     },
     {
       headers: {
-        Authorization: `Basic ${authToken}`,
+        Authorization: `Bearer ${authToken}`,
       },
     }
   );
@@ -75,7 +73,7 @@ export const deletePoll = async (
 ): Promise<any> => {
   await axios.delete(`${API_URL}/polls/${pollUid}`, {
     headers: {
-      Authorization: `Basic ${authToken}`,
+      Authorization: `Bearer ${authToken}`,
     },
   });
 };
@@ -86,7 +84,7 @@ export const getAllPolls = async (
   return (
     await axios.get(`${API_URL}/polls`, {
       headers: {
-        Authorization: `Basic ${authToken}`,
+        Authorization: `Bearer ${authToken}`,
       },
     })
   ).data;
@@ -98,7 +96,7 @@ export const getAllPollStats = async (
   return (
     await axios.get(`${API_URL}/polls/stats`, {
       headers: {
-        Authorization: `Basic ${authToken}`,
+        Authorization: `Bearer ${authToken}`,
       },
     })
   ).data;

@@ -33,10 +33,10 @@ const AddAdminForm: React.FC<FormDialogProps> = (props) => {
   const [usernameError, setUsernameError] = React.useState(UsernameError.None);
 
   const [registerTrigger, setRegisterTrigger] = React.useState(false);
-  const { basicAuth } = React.useContext(UserContext);
+  const { jwt } = React.useContext(UserContext);
   const { status, remove } = useQuery(
     "register",
-    () => register(username, password, basicAuth!!),
+    () => register(username, password, jwt!!),
     {
       enabled: registerTrigger,
       retry: false,

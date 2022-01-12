@@ -12,9 +12,9 @@ export interface PollsPageProps {
 }
 
 const PollsPage: React.FC<PollsPageProps> = ({ refresh, setRefresh }) => {
-  const { basicAuth } = React.useContext(UserContext);
+  const { jwt } = React.useContext(UserContext);
   const { data, status, remove } = useQuery("get-all-polls-stats", () =>
-    getAllPollStats(basicAuth!!)
+    getAllPollStats(jwt!!)
   );
 
   React.useEffect(() => {
