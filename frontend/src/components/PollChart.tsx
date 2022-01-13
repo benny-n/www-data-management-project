@@ -10,6 +10,17 @@ import { deletePoll } from "../api";
 import { UserContext } from "../App";
 import { PollStats } from "../types";
 
+const determineFontSize = (questionLength: number) => {
+  if (questionLength < 20) {
+    return "1.5rem";
+  } else if (questionLength < 50) {
+    return "1rem";
+  } else if (questionLength < 100) {
+    return "0.75rem";
+  } else {
+    return "0.5rem";
+  }
+};
 export interface PollChartProps {
   pollStats: PollStats;
   setRefresh: (_: boolean) => void;
@@ -39,6 +50,8 @@ const PollChart: React.FC<PollChartProps> = ({ pollStats, setRefresh }) => {
   const handleClickDelete = () => {
     setDeleteTrigger(true);
   };
+
+  const questionFontSize = determineFontSize(pollStats.question.length);
 
   React.useLayoutEffect(() => {
     let root = am5.Root.new(`chartdiv-${pollStats.uid}`);
@@ -85,7 +98,7 @@ const PollChart: React.FC<PollChartProps> = ({ pollStats, setRefresh }) => {
         flexDirection: "column",
         width: "100%",
         alignItems: "center",
-        justifyContent: "center",
+        justifyContent: "space-between",
         gap: 2,
       }}
     >
@@ -98,12 +111,15 @@ const PollChart: React.FC<PollChartProps> = ({ pollStats, setRefresh }) => {
           justifyContent: "space-between",
         }}
       >
-        <Typography fontWeight="bold" variant="h5" sx={{ marginLeft: "35%" }}>
+        <Typography
+          fontWeight="bold"
+          sx={{ fontSize: questionFontSize, marginLeft: "10px" }}
+        >
           {pollStats.question}
         </Typography>
         <IconButton
           size="large"
-          sx={{ marginRight: "10px" }}
+          sx={{ marginRight: "5px" }}
           onClick={handleClickDelete}
         >
           <DeleteForeverIcon />
