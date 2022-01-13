@@ -65,10 +65,6 @@ class UserResponse(db.Model):
             [PollAnswer.uid, PollAnswer.index],
             ondelete="CASCADE"
         ),
-        ForeignKeyConstraint(
-            (chat_id,),
-            [User.chat_id]
-        )
     )
 
 
