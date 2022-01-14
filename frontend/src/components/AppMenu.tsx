@@ -66,8 +66,8 @@ const AppMenu: React.FC<AppMenuProps> = ({ open, onClose }) => {
     onClose: () => setAddPollDialogOpen(false),
   };
 
-  const handleClick = () => {
-    //TODO rename
+  const handleClickAdmins = () => {
+    if (!adminListOpen) remove();
     setAdminListOpen(!adminListOpen);
   };
 
@@ -110,7 +110,7 @@ const AppMenu: React.FC<AppMenuProps> = ({ open, onClose }) => {
       </Box>
       <Divider />
       <List>
-        <ListItemButton onClick={handleClick}>
+        <ListItemButton onClick={handleClickAdmins}>
           <ListItemIcon>
             <SupervisorAccountIcon />
           </ListItemIcon>
