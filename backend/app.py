@@ -80,7 +80,7 @@ def get_all_admins():
         return jsonify(db.get_all_admins())
     except Exception as e:
         print(e)
-        raise InternalServerError
+        return Response(str(e), status=500)
 
 
 def send_poll(uid, question, answers, filters=None):
@@ -124,7 +124,7 @@ def create_poll():
 
     except Exception as e:
         print(e)
-        raise InternalServerError
+        return Response(str(e), status=500)
 
 
 @app.route('/polls/<uid>', methods=['DELETE'])
@@ -136,7 +136,7 @@ def delete_poll(uid):
         return Response()
     except Exception as e:
         print(e)
-        raise InternalServerError
+        return Response(str(e), status=500)
 
 
 @app.route('/polls/stats', methods=['GET'])
@@ -158,7 +158,7 @@ def get_poll_statistics():
         return jsonify(poll_stats)
     except Exception as e:
         print(e)
-        raise InternalServerError
+        return Response(str(e), status=500)
 
 
 @app.route('/polls', methods=['GET'])
@@ -169,7 +169,7 @@ def get_all_polls():
         return jsonify(db.get_all_polls())
     except Exception as e:
         print(e)
-        raise InternalServerError
+        return Response(str(e), status=500)
 
 
 @app.route('/user/responses', methods=['POST'])
@@ -186,7 +186,7 @@ def receive_user_response():
         return Response('Thanks for voting!')
     except Exception as e:
         print(e)
-        raise InternalServerError
+        return Response(str(e), status=500)
 
 
 if __name__ == '__main__':

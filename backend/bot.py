@@ -14,6 +14,15 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
+def start(update: Update, _) -> None:
+    update.message.reply_text("""
+    Hey! Welcome to our polling service! 
+    list of available commands:
+    /start - prints this message
+    /register - registers you to the polling service
+    /remove - removes you from the polling service""")
+
+
 def register(update: Update, _) -> None:
 
     response = requests.post(
@@ -41,7 +50,7 @@ def receive_poll_answer(update: Update, context: CallbackContext) -> None:
         f"http://localhost:5000/user/responses",
         params={"chat_id": chat_id, "telegram_id": telegram_id, "answer_index": answer_index}
     )
-    resp_msg = "Something unexpected happened 😵" if response.status_code != 200 else "Thanks for voting!"
+    resp_msg = "This poll is already closed 🤷🏻‍♂️" if response.status_code != 200 else "Thanks for voting!"
     context.bot.send_message(chat_id, resp_msg, parse_mode=ParseMode.HTML)
 
 
@@ -52,6 +61,7 @@ def bot() -> None:
     dispatcher = updater.dispatcher
 
     # Add command handlers
+    dispatcher.add_handler(CommandHandler("start", start, run_async=True))
     dispatcher.add_handler(CommandHandler("register", register, run_async=True))
     dispatcher.add_handler(CommandHandler("remove", remove, run_async=True))
     dispatcher.add_handler(PollAnswerHandler(receive_poll_answer, run_async=True))

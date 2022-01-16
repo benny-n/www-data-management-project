@@ -109,13 +109,9 @@ const AddAdminForm: React.FC<FormDialogProps> = (props) => {
 
   React.useEffect(() => {
     if (status === "error") {
-      //TODO set error state
-      console.log("error");
       setRegisterTrigger(false);
     } else if (status === "success") {
-      setRegisterTrigger(false);
       handleClose();
-      console.log("success");
     }
   }, [status, handleClose]);
 

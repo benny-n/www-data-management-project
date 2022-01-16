@@ -73,7 +73,7 @@ const AppMenu: React.FC<AppMenuProps> = ({ open, onClose }) => {
 
   React.useEffect(() => {
     remove();
-  }, [addAdminDialogOpen, remove]);
+  }, [addAdminDialogOpen, remove, status]);
 
   const handleLogout = () => {
     localStorage.removeItem("jwt");

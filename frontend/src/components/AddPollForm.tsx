@@ -144,6 +144,9 @@ const AddPollForm: React.FC<FormDialogProps> = (props) => {
   }, [filters, filtersError]);
 
   React.useEffect(() => {
+    if (status === "error") {
+      setCreateTrigger(false);
+    }
     if (status === "success") {
       handleClose();
     }
